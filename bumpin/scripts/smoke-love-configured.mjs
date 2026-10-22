@@ -117,9 +117,10 @@ async function api(path, cookie, method = "GET", body, status = 200) {
         stdio: ["ignore", "pipe", "pipe"],
         timeout: 40000,
       });
-    } catch {
+    } catch (error) {
+      const detail = error.code ?? error.status ?? error.signal ?? "unknown transport error";
       throw new Error(
-        "Authenticated deployment request failed; no credentials logged",
+        `Authenticated deployment request failed (${detail}); no credentials logged`,
       );
     }
     const separator = output.lastIndexOf("\n");
