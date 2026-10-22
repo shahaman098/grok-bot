@@ -23,4 +23,10 @@ The concierge includes a “Who should I meet?” example and explains that audi
 - **13 configured local HTTP scenarios** passed against Supabase, including three real xAI semantic requests (paraphrased expertise, combined offer/project evidence, and broad-query personalization), ephemeral voice credential issuance, paid approval/revocation, onboarding, introductions and stage consent. All temporary accounts/events were removed.
 - The first local HTTP run hit the cold development route compilation timeout; warming the isolated server resolved it. The first browser assertion incorrectly expected the voice tool’s evidence strings to be field objects; the corrected assertion checks both returned quotes.
 
-Physical-phone spoken input and noisy-room quality are not verified by these automated checks. Deployment checks are recorded after integration.
+## Combined source verification
+
+The shared-profile/map release handed over after production `dpl_9Fc8phL6xWfkHMoQsmX4fDrVWbwm`. Only the reviewed concierge files, focused tests and documentation were integrated. Current profile, LinkedIn and private-location source was preserved. The combined source passes typecheck, full ESLint, all **124 tests** and the production build. The **6 simulated mobile browser cases** pass again against that production build, including opening a matched person’s full shared profile.
+
+Generated `outputs/` recordings/presentations and `artifacts/` are now excluded from Vercel bundles. The first upload was canceled before deployment because these unrelated files inflated the bundle.
+
+Physical-phone spoken input and noisy-room quality are not verified by these automated checks. Deployment verification follows below.
