@@ -1,9 +1,5 @@
-# Judge demo script (90 seconds)
-0–15s: 'At a crowded hackathon, the right collaborator may be metres away but invisible.'
-15–30s: scan QR on phone A; join with name, avatar, LinkedIn; choose visibility; GPS optional.
-30–45s: phone B joins; watch second avatar appear in real time on A.
-45–60s: zoom map, tap avatar; bottom sheet reveals LinkedIn and shared event.
-60–75s: open event marker → Luma link. Ask 'Who is building AI agents?' Show reasoned matching only if functional, label rules-based fallback clearly.
-75–90s: 'We turn community membership into real-world introductions. Next: verified Grok Bot integration.'
+# Demo entry point
 
-Have demo accounts and backup recording; never represent seeded avatars as live users. Show privacy toggle. Verify judging track at organiser briefing.
+Use the current [three-minute demo script](DEMO-SCRIPT.md) and [rehearsal checklist](REHEARSAL-CHECKLIST.md).
+
+BumpIn's Love at First Bot is event-scoped member matchmaking for Track 2. It uses rules, requires mutual introduction acceptance and separate stage approval, and does not request GPS. External Grok Bot integration is disabled.

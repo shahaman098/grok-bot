@@ -5,6 +5,7 @@ export function mapAttendeeRow(row: {
   display_name: string;
   linkedin_url: string | null;
   avatar_seed: string;
+  avatar_url?: string | null;
   building: string | null;
   can_help_with?: string | null;
   looking_for: string | null;
@@ -13,12 +14,14 @@ export function mapAttendeeRow(row: {
   is_self: boolean;
 }): PublicAttendee | null {
   if (row.display_lat == null || row.display_lng == null) return null;
-  if (!row.is_self && row.display_lat === 0 && row.display_lng === 0) return null;
+  if (!row.is_self && row.display_lat === 0 && row.display_lng === 0)
+    return null;
   return {
     membershipId: row.membership_id,
     displayName: row.display_name,
     linkedinUrl: row.linkedin_url,
     avatarSeed: row.avatar_seed,
+    avatarUrl: row.avatar_url ?? null,
     building: row.building,
     canHelpWith: row.can_help_with ?? null,
     lookingFor: row.looking_for,

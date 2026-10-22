@@ -1,3 +1,4 @@
+import { linkedInIdentity } from "@/lib/auth/linkedin";
 import { NextResponse } from "next/server";
 import { resolveDisplayPosition } from "@/lib/display-position";
 import { patchMeSchema } from "@/lib/validation";
@@ -38,11 +39,11 @@ export async function PATCH(request: Request) {
     }
 
     const visible = body.visible ?? existing.visible;
-    const locationConsent =
-      body.locationConsent ?? existing.location_consent;
+    const locationConsent = body.locationConsent ?? existing.location_consent;
 
     const profilePatch: Record<string, string | null> = {};
-    if (body.canHelpWith !== undefined) profilePatch.can_help_with = body.canHelpWith.trim() || null;
+    if (body.canHelpWith !== undefined)
+      profilePatch.can_help_with = body.canHelpWith.trim() || null;
     if (body.building !== undefined) {
       profilePatch.building = body.building.trim() || null;
     }
@@ -51,8 +52,15 @@ export async function PATCH(request: Request) {
     }
 
     if (Object.keys(profilePatch).length > 0) {
-      const { error } = await supabase.from("profiles").update(profilePatch).eq("id", user.id);
-      if (error) return NextResponse.json({ error: "Could not update profile" }, { status: 500 });
+      const { error } = await supabase
+        .from("profiles")
+        .update(profilePatch)
+        .eq("id", user.id);
+      if (error)
+        return NextResponse.json(
+          { error: "Could not update profile" },
+          { status: 500 },
+        );
     }
 
     let displayLat: number | null = null;
@@ -94,25 +102,66 @@ export async function PATCH(request: Request) {
   }
 }
 
-
 export async function GET(request: Request) {
   const eventSlug = new URL(request.url).searchParams.get("eventSlug");
   if (!eventSlug || eventSlug.length > 64) {
-    return NextResponse.json({ error: "Event slug is required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Event slug is required" },
+      { status: 400 },
+    );
   }
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const { data: event, error: eventError } = await supabase.from("events").select("id").eq("slug", eventSlug).maybeSingle();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { data: event, error: eventError } = await supabase
+      .from("events")
+      .select("id")
+      .eq("slug", eventSlug)
+      .maybeSingle();
     if (eventError) throw eventError;
-    if (!event) return NextResponse.json({ error: "Event not found" }, { status: 404 });
-    const { data: membership, error } = await supabase.from("event_memberships").select("visible").eq("event_id", event.id).eq("user_id", user.id).maybeSingle();
+    if (!event)
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    const { data: membership, error } = await supabase
+      .from("event_memberships")
+      .select("visible")
+      .eq("event_id", event.id)
+      .eq("user_id", user.id)
+      .maybeSingle();
     if (error) throw error;
-    const { data: profile, error: profileError } = await supabase.from("profiles").select("display_name, avatar_seed, building, can_help_with, looking_for").eq("id", user.id).maybeSingle();
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select(
+        "display_name, avatar_seed, avatar_url, linkedin_url, building, can_help_with, looking_for",
+      )
+      .eq("id", user.id)
+      .maybeSingle();
     if (profileError) throw profileError;
-    return NextResponse.json({ membership, profile: profile ? { displayName: profile.display_name, avatarSeed: profile.avatar_seed, building: profile.building, canHelpWith: profile.can_help_with, lookingFor: profile.looking_for } : null }, { headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json(
+      {
+        membership,
+        identity: linkedInIdentity(user),
+        profile: profile
+          ? {
+              displayName: profile.display_name,
+              avatarSeed: profile.avatar_seed,
+              avatarUrl: profile.avatar_url,
+              linkedinUrl: profile.linkedin_url,
+              building: profile.building,
+              canHelpWith: profile.can_help_with,
+              lookingFor: profile.looking_for,
+            }
+          : null,
+      },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   } catch {
-    return NextResponse.json({ error: "Could not restore event membership" }, { status: 503 });
+    return NextResponse.json(
+      { error: "Could not restore event membership" },
+      { status: 503 },
+    );
   }
 }

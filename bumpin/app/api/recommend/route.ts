@@ -32,8 +32,14 @@ export async function POST(request: Request) {
       .filter((a): a is PublicAttendee => a !== null);
 
     const self = attendees.find((a) => a.isSelf);
-    if (!body.query && !self) return NextResponse.json({ error: "Become visible to find a collaborator." }, { status: 403 });
-    const matches = body.query ? recommendRules(attendees, body.query) : recommendForProfile(self!, attendees);
+    if (!body.query && !self)
+      return NextResponse.json(
+        { error: "Become visible to find a collaborator." },
+        { status: 403 },
+      );
+    const matches = body.query
+      ? recommendRules(attendees, body.query)
+      : recommendForProfile(self!, attendees);
 
     const source =
       matches.length > 0 && matches[0].source === "grok" ? "grok" : "rules";

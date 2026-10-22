@@ -58,7 +58,11 @@ export function AttendeeList({ attendees, onSelect, onShare }: Props) {
                 aria-label={`Open profile for ${person.displayName}`}
                 onClick={() => onSelect(person)}
               >
-                <Avatar seed={person.avatarSeed} size={56} />
+                <Avatar
+                  seed={person.avatarSeed}
+                  photo={person.avatarUrl}
+                  size={56}
+                />
                 <span className="person-copy">
                   <span className="person-name">{person.displayName}</span>
                   <span className="person-detail">

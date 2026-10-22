@@ -1,0 +1,155 @@
+Window: "Grok Bot", App: Grok Bot.
+0 standard window Grok Bot, Secondary Actions: Raise
+	1 container Grok Bot
+		2 container
+			3 HTML content Grok Bot, URL: file:///Applications/Grok%20Bot.app/Contents/Resources/app.asar/dist/renderer/index.html
+				4 container
+					5 container Bots
+						6 button Search
+						7 button New Bot
+						8 container Bot list
+							9 container Pinned Bots
+								10 button Sorcerer, Main Bot, Unread activity
+									11 container Unread activity
+									12 text Sorcerer
+							13 content list
+								14 button Jarvis
+									15 text Jarvis
+									16 text Confirmed, the synthetic attendee is gone. A fresh "AI agents TypeScript design" search on grok-bot-london with the new token found 0 matches.
+						17 pop-up button Kris Sah
+						18 button Connect apps
+						19 button Update — a new version is available
+						20 splitter Resize sidebar
+					21 container Jarvis
+						22 container Jarvis
+							23 heading Description: Jarvis, Value: 2
+								24 button View conversation details
+									25 text Jarvis
+						26 container Voice chat
+							27 button Show settings
+							28 button Show transcript
+							29 toggle button Description: Mute, Value: 0
+							30 button Hang up
+						31 container Conversation transcript
+							32 container
+								33 container You 8:54:53 PM
+									34 container You Please request a replacement secret named BUMPIN_TOKEN_V2 in a secure input card. I am rotating the old event token. Use only the replacement token for future BumpIn calls, keeping credentials out of chat. Keep the connector name and URL unchanged. Do not send introductions.
+										35 text You
+										36 text Please request a replacement secret named BUMPIN_TOKEN_V2 in a secure input card. I am rotating the old event token. Use only the replacement token for future BumpIn calls, keeping credentials out of chat. Keep the connector name and URL unchanged. Do not send introductions.
+									37 container 8:54:53 PM
+										38 text 8:54 PM
+								39 container Jarvis 8:54:59 PM
+									40 container Jarvis I'm opening a secure box for the new token. From now on I'll only use that one for BumpIn.
+										41 text Jarvis
+										42 text I'm opening a secure box for the new token. From now on I'll only use that one for BumpIn.
+									43 container 8:54:59 PM
+										44 text 8:54 PM
+								45 container Jarvis 8:55:00 PM
+									46 container BumpIn Bearer token (replacement)
+										47 container BumpIn Bearer token (replacement)
+											48 button Secrets Saved · BumpIn Bearer token (replacement)
+												49 text Secrets
+												50 text Saved
+												51 text  · 
+												52 text BumpIn Bearer token (replacement)
+									53 container 8:55:00 PM
+										54 text 8:55 PM
+								55 container Jarvis 8:58:31 PM
+									56 container Jarvis The new token is saved, and from now on my BumpIn calls will only use it. BumpIn accepted it on a test run of the "AI agents TypeScript design" search for grok-bot-london. That search came back with 0 matches this time, though, even though the synthetic QA attendee showed up a few minutes ago with the old token. Maybe the test attendee has been removed or hidden. Or maybe the new token is scoped to a different member, so the search sees different profiles. If it's meant to still be visible, that's wo
+										57 text Jarvis
+										58 container
+											59 text The new token is saved, and from now on my BumpIn calls will only use it. BumpIn accepted it on a test run of the "AI agents TypeScript design" search for 
+											60 text grok-bot-london
+											61 text . That search came back with 
+											62 text 0 matches
+											63 text  this time, though, even though the synthetic QA attendee showed up a few minutes ago with the old token. Maybe the test attendee has been removed or hidden. Or maybe the new token is scoped to a different member, so the search sees different profiles. If it's meant to still be visible, that's worth checking on BumpIn's side. The connector's name and URL are unchanged. The token never appeared in chat, and I haven't sent any introductions.
+									64 container 8:58:31 PM
+										65 text 8:58 PM
+								66 container You 9:00:32 PM
+									67 container You The zero result was expected because I intentionally hid the synthetic QA attendee. I have now made it visible again. Using only BUMPIN_TOKEN_V2, repeat find_people for 'AI agents TypeScript design' and find_my_collaborators. Report the actual results and exact evidence. The guest profile has no offers or needs, so an empty collaborator list is expected. Do not send introductions or edit profiles.
+										68 text You
+										69 text The zero result was expected because I intentionally hid the synthetic QA attendee. I have now made it visible again. Using only BUMPIN_TOKEN_V2, repeat find_people for 'AI agents TypeScript design' and find_my_collaborators. Report the actual results and exact evidence. The guest profile has no offers or needs, so an empty collaborator list is expected. Do not send introductions or edit profiles.
+									70 container 9:00:32 PM
+										71 text 9:00 PM
+								72 container Jarvis 9:00:37 PM
+									73 container Jarvis Running both searches again now, using only the new token.
+										74 text Jarvis
+										75 text Running both searches again now, using only the new token.
+									76 container 9:00:37 PM
+										77 text 9:00 PM
+								78 container Jarvis 9:00:50 PM
+									79 container Jarvis Both results came back as you expected. Searching "AI agents TypeScript design" found the synthetic QA attendee again, and find_my_collaborators returned an empty list. Both ran on grok-bot-london using only the new token, and both results came from BumpIn's rule-based matching. find_people with "AI agents TypeScript design" found 1 match. It's the synthetic test attendee, not a real person: Display name: "BumpIn QA — synthetic attendee" Score 4, with the matched terms agent, ai, design and typescrip
+										80 text Jarvis
+										81 container
+											82 text Both results came back as you expected. Searching "AI agents TypeScript design" found the synthetic QA attendee again, and 
+											83 text find_my_collaborators
+											84 text  returned an empty list. Both ran on 
+											85 text grok-bot-london
+											86 text  using only the new token, and both results came from BumpIn's rule-based matching.
+											87 container
+												88 text find_people  with "AI agents TypeScript design" found 1 match.
+											89 text  It's the 
+											90 text synthetic test attendee, not a real person
+											91 text :
+											92 content list
+												93 container
+													94 AXListMarker • 
+													95 text Display name: "BumpIn QA — synthetic attendee"
+												96 container
+													97 AXListMarker • 
+													98 text Score 4, with the matched terms  agent ,  ai ,  design  and  typescript
+												99 container
+													100 AXListMarker • 
+													101 text Exact text it matched on their profile: "SYNTHETIC QA FIXTURE: AI agents built with TypeScript · TypeScript development and interface design · AI agent testing"
+												102 container
+													103 AXListMarker • 
+													104 text Membership ID:  675c7e76…83da50 , the same as with the old token
+												105 container
+													106 AXListMarker • 
+													107 text BumpIn's suggested opener: "Our profiles connect around agent, ai, design, typescript. What is one specific problem we could explore together?"
+											108 container
+												109 text find_my_collaborators  found 0 matches
+											110 text , which is what you'd expect with no offers or needs on your guest profile. I haven't sent any introductions or edited any profiles.
+									111 container 9:00:50 PM
+										112 text 9:00 PM
+								113 container You 9:03:30 PM
+									114 container You The synthetic QA account and its event membership have been deleted. Run one final find_people search for 'AI agents TypeScript design' using BUMPIN_TOKEN_V2 and confirm the synthetic attendee is absent. For future BumpIn searches here, use that replacement secret until its 21:55 London expiry. Do not reuse cached QA suggestions or send introductions.
+										115 text You
+										116 text The synthetic QA account and its event membership have been deleted. Run one final find_people search for 'AI agents TypeScript design' using BUMPIN_TOKEN_V2 and confirm the synthetic attendee is absent. For future BumpIn searches here, use that replacement secret until its 21:55 London expiry. Do not reuse cached QA suggestions or send introductions.
+									117 container 9:03:30 PM
+										118 text 9:03 PM
+								119 container Jarvis 9:03:34 PM
+									120 container Jarvis Running the final check now with the new token.
+										121 text Jarvis
+										122 text Running the final check now with the new token.
+									123 container 9:03:34 PM
+										124 text 9:03 PM
+								125 container Jarvis 9:03:49 PM
+									126 container Jarvis Confirmed, the synthetic attendee is gone. A fresh "AI agents TypeScript design" search on grok-bot-london with the new token found 0 matches. I'll use only that token for BumpIn searches until it expires at 21:55 BST tonight, and I won't reuse any of the old QA results. After it expires, I'll need a new token to search again. No introductions were sent.
+										127 text Jarvis
+										128 container
+											129 text Confirmed, the synthetic attendee is gone. A fresh "AI agents TypeScript design" search on 
+											130 text grok-bot-london
+											131 text  with the new token found 
+											132 text 0 matches
+											133 text . I'll use only that token for BumpIn searches until it expires at 21:55 BST tonight, and I won't reuse any of the old QA results. After it expires, I'll need a new token to search again. No introductions were sent.
+									134 container 9:03:49 PM
+										135 text 9:03 PM
+						136 container
+							137 text entry area (settable) Description: Prompt, Placeholder: Message Jarvis, Value: 
+
+							138 pop-up button Composer actions
+							139 button Start voice input
+					140 text Jarvis replied
+	141 close button
+	142 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	143 minimise button
+144 menu bar
+	145 Grok Bot
+	146 File
+	147 Edit
+	148 View
+	149 Window
+	150 Help
+
+The focused UI element is 137 text entry area (settable) Description: Prompt, Placeholder: Message Jarvis, Value: 

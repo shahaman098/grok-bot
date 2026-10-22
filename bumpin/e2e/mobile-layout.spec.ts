@@ -99,33 +99,21 @@ for (const viewport of [
   });
 }
 
-test("join page scrolls on a narrow phone with readable fields and no default consent", async ({
+test("minimal entry has no profile fields on a narrow phone", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto("/e/grok-bot-london");
   await page.getByRole("button", { name: "Leave", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Join event" })).toBeDisabled();
+  await page.getByRole("button", { name: "Leave event", exact: true }).click();
+  const guest = page.getByRole("button", { name: "Continue as guest" });
+  await expect(guest).toBeEnabled();
+  await expect(page.locator("input, textarea, select")).toHaveCount(0);
   await expect(
-    page.getByRole("checkbox", { name: /Appear on attendee map/ }),
-  ).not.toBeChecked();
-  await expect(page.getByPlaceholder("linkedin.com/in/you")).not.toBeVisible();
-  await page.getByText("Add a little about you").click();
-  await expect(page.getByPlaceholder("linkedin.com/in/you")).toBeVisible();
-  for (const input of await page
-    .locator('input:not([type="checkbox"])')
-    .all()) {
-    expect(
-      await input.evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
-    ).toBeGreaterThanOrEqual(16);
-    expect((await input.boundingBox())!.height).toBeGreaterThanOrEqual(44);
-  }
-  await page
-    .getByRole("button", { name: "Join event" })
-    .scrollIntoViewIfNeeded();
-  await expect(
-    page.getByRole("button", { name: "Join event" }),
-  ).toBeInViewport();
+    page.getByRole("button", { name: "Join with LinkedIn" }),
+  ).toBeVisible();
+  await guest.scrollIntoViewIfNeeded();
+  await expect(guest).toBeInViewport();
   await noOverflow(page);
 });
 
@@ -175,7 +163,9 @@ test("matching works at keyboard-sized heights and reports an empty result", asy
   });
   await page.reload();
   await page.getByRole("button", { name: "Find people to meet" }).click();
-  await page.getByText("Or search for a skill or project", { exact: true }).click();
+  await page
+    .getByText("Or search for a skill or project", { exact: true })
+    .click();
   await page.setViewportSize({ width: 390, height: 400 });
   await page
     .getByRole("button", {
@@ -211,5 +201,10 @@ test("home and QR pages fit a narrow phone", async ({ page }) => {
   await noOverflow(page);
   await page.goto("/qr");
   await expect(page.getByRole("link", { name: "Open event" })).toBeVisible();
+  const eventUrl = `${new URL(page.url()).origin}/e/grok-bot-london`;
+  await expect(
+    page.getByRole("img", { name: "QR code for event join link" }),
+  ).toHaveAttribute("src", /^data:image\/png;base64,/);
+  await expect(page.getByText(eventUrl, { exact: true })).toBeVisible();
   await noOverflow(page);
 });

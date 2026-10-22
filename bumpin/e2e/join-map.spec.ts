@@ -74,7 +74,10 @@ test("restores membership, preserves hidden profile, and removes the leaver", as
       visible: true,
     });
   await page.getByRole("button", { name: "Leave", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Join event" })).toBeVisible();
+  await page.getByRole("button", { name: "Leave event", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Continue as guest" }),
+  ).toBeVisible();
   await expect
     .poll(() =>
       page.evaluate(() => {
@@ -86,7 +89,9 @@ test("restores membership, preserves hidden profile, and removes the leaver", as
     )
     .toEqual(["Ada"]);
   await page.reload();
-  await expect(page.getByRole("button", { name: "Join event" })).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Continue as guest" }),
+  ).toBeEnabled();
 });
 
 test("offers rules-based matching and excludes your own profile", async ({
@@ -94,7 +99,9 @@ test("offers rules-based matching and excludes your own profile", async ({
 }) => {
   await page.goto("/e/grok-bot-london");
   await page.getByRole("button", { name: "Find people to meet" }).click();
-  await page.getByText("Or search for a skill or project", { exact: true }).click();
+  await page
+    .getByText("Or search for a skill or project", { exact: true })
+    .click();
   await expect(page.getByText("Source: Rules-based matching")).toBeVisible();
   await page
     .getByRole("button", { name: "Who is building AI agents?", exact: true })

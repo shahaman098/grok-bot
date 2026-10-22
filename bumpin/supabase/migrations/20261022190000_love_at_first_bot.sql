@@ -151,7 +151,7 @@ end;
 $$;
 create function public.stage_connection(p_event_slug text,p_id uuid) returns jsonb
 language sql stable security definer set search_path=public as $$
-  select public.connection_snapshot(c) from public.connections c join public.events e on e.id=c.event_id
+  select public.connection_snapshot(c) - 'conversationStarter' from public.connections c join public.events e on e.id=c.event_id
   where c.id=p_id and e.slug=p_event_slug and c.status='accepted' and c.sender_stage and c.recipient_stage
     and exists(select 1 from public.event_memberships m where m.event_id=c.event_id and m.user_id=c.sender_id and m.visible)
     and exists(select 1 from public.event_memberships m where m.event_id=c.event_id and m.user_id=c.recipient_id and m.visible);

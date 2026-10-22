@@ -52,6 +52,9 @@ export function EventInfoSheet({ event, open, onOpenChange }: Props) {
         Your profile is shared only when you choose to be visible. Map markers
         show the event area.
       </div>
+      <a href="/connect/grok" className="secondary-button">
+        Connect your Grok Bot <ArrowUpRight size={18} />
+      </a>
     </MobileSheet>
   );
 }

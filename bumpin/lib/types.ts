@@ -3,6 +3,7 @@ export type PublicAttendee = {
   displayName: string;
   linkedinUrl: string | null;
   avatarSeed: string;
+  avatarUrl?: string | null;
   building: string | null;
   canHelpWith?: string | null;
   lookingFor: string | null;
@@ -13,6 +14,7 @@ export type PublicAttendee = {
 
 export type MatchCategory = "mutual" | "one-way" | "shared-interest" | "search";
 export type MatchEvidence = {
+  profileField?: "canHelpWith" | "building" | "lookingFor";
   direction: "they-help-you" | "you-help-them" | "shared-interest" | "search";
   terms: string[];
   yourExcerpt: string;
@@ -40,7 +42,6 @@ export type StageSnapshot = {
   people: [StagePerson, StagePerson];
   category: MatchCategory;
   evidence: MatchEvidence[];
-  conversationStarter: string;
   suggestedTask: string;
   jokes: [string | null, string | null];
 };
@@ -52,10 +53,16 @@ export type Connection = {
   ownStageApproved: boolean;
   otherStageApproved: boolean;
   ownJokeId: string | null;
-  snapshot: StageSnapshot;
+  snapshot: StageSnapshot & { conversationStarter: string };
 };
 export type ConnectionAction = {
-  action: "accept" | "decline" | "withdraw" | "chooseJoke" | "approveStage" | "revokeStage";
+  action:
+    | "accept"
+    | "decline"
+    | "withdraw"
+    | "chooseJoke"
+    | "approveStage"
+    | "revokeStage";
   jokeId?: string | null;
   expectedRevision?: number;
 };

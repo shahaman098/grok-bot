@@ -2,9 +2,14 @@
 
 import dynamic from "next/dynamic";
 import { AskGrokPanel } from "@/components/grok/ask-grok-panel";
+import { ConciergePanel, type ConciergeSearchResult } from "@/components/concierge/concierge-panel";
+import { MapMatches } from "@/components/concierge/map-matches";
+import conciergeStyles from "@/components/concierge/styles";
+import { availableMatches } from "@/lib/concierge/available-matches";
 import { EventInfoSheet } from "@/components/event/event-info-sheet";
 import { JoinCard, type JoinFormValues } from "@/components/join/join-card";
 import { ProfileSheet } from "@/components/profile/profile-sheet";
+import { MobileSheet } from "@/components/ui/mobile-sheet";
 import {
   getDemoMember,
   listDemoAttendees,
@@ -14,12 +19,22 @@ import {
   upsertDemoMember,
   updateDemoProfile,
 } from "@/lib/demo/local-pool";
+import type { LinkedInIdentity } from "@/lib/auth/linkedin";
 import { ensureSession } from "@/lib/auth/ensure-session";
-import { createDemoConnection, listDemoConnections, updateDemoConnection } from "@/lib/demo/connections";
+import {
+  createDemoConnection,
+  listDemoConnections,
+  updateDemoConnection,
+} from "@/lib/demo/connections";
 import type { MatchProfile } from "@/components/matching/profile-editor";
 import { recommendForProfile, recommendRules } from "@/lib/matching/rules";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import type { Connection, ConnectionAction, PublicAttendee, RecommendResult } from "@/lib/types";
+import type {
+  Connection,
+  ConnectionAction,
+  PublicAttendee,
+  RecommendResult,
+} from "@/lib/types";
 import { normalizeLinkedInUrl } from "@/lib/validation";
 import {
   Eye,
@@ -79,18 +94,54 @@ export function EventExperience({ slug, initialEvent }: Props) {
   const [selected, setSelected] = useState<PublicAttendee | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const [eventOpen, setEventOpen] = useState(false);
+  const [leaveOpen, setLeaveOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
   const refreshPending = useRef<Promise<void> | null>(null);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [connectionError, setConnectionError] = useState<string | null>(null);
-  const [matchProfile, setMatchProfile] = useState<MatchProfile>({ building: null, canHelpWith: null, lookingFor: null });
+  const [matchProfile, setMatchProfile] = useState<MatchProfile>({
+    building: null,
+    canHelpWith: null,
+    lookingFor: null,
+  });
   const [demoMode] = useState(!isSupabaseConfigured());
 
   const [view, setView] = useState<"people" | "map">("people");
+  const [conciergeMatches, setConciergeMatches] = useState<RecommendResult[]>([]);
+  const [focusedMatchId, setFocusedMatchId] = useState<string | null>(null);
+  const currentConciergeMatches = visible ? availableMatches(conciergeMatches, attendees) : [];
+
+  async function askConcierge(query: string, signal?: AbortSignal): Promise<ConciergeSearchResult> {
+    if (demoMode) return {
+      matches: recommendRules(attendees, query).slice(0, 3),
+      source: "rules",
+      fallbackReason: "Preview mode uses basic matching on this browser.",
+    };
+    return requestJson<ConciergeSearchResult>("/api/concierge/search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ eventSlug: slug, query }),
+      signal,
+    });
+  }
+  function showConciergeMatches(matches: RecommendResult[]) {
+    setConciergeMatches(matches);
+    setFocusedMatchId(matches[0]?.membershipId ?? null);
+    if (matches.length) setView("map");
+  }
+  function focusConciergeMatch(id: string) {
+    if (!currentConciergeMatches.some(match => match.membershipId === id)) return false;
+    setFocusedMatchId(id);
+    setView("map");
+    return true;
+  }
   const [shareStatus, setShareStatus] = useState<string | null>(null);
   const [restoring, setRestoring] = useState(true);
+  const [linkedinAvailable, setLinkedinAvailable] = useState(false);
+  const [identity, setIdentity] = useState<LinkedInIdentity | null>(null);
+  const [joinInitial, setJoinInitial] = useState<Partial<JoinFormValues>>({});
 
   useEffect(() => {
     const viewport = window.visualViewport;
@@ -139,17 +190,27 @@ export function EventExperience({ slug, initialEvent }: Props) {
       return;
     }
     if (!refreshPending.current) {
-      refreshPending.current = requestJson<{ attendees: PublicAttendee[] }>(
-        `/api/events/${slug}/attendees`,
-      )
-        .then(async (json) => {
-          setAttendees(json.attendees);
-          const self = json.attendees.find((a) => a.isSelf);
+      refreshPending.current = Promise.allSettled([
+        requestJson<{ attendees: PublicAttendee[] }>(
+          `/api/events/${slug}/attendees`,
+        ),
+        requestJson<{ connections: Connection[] }>(
+          `/api/connections?eventSlug=${encodeURIComponent(slug)}`,
+        ),
+      ])
+        .then(([directory, introductions]) => {
+          if (introductions.status === "fulfilled") {
+            setConnections(introductions.value.connections);
+            setConnectionError(null);
+          } else {
+            setConnectionError(
+              "Could not refresh introductions. Your last confirmed requests are shown; please retry.",
+            );
+          }
+          if (directory.status === "rejected") throw directory.reason;
+          setAttendees(directory.value.attendees);
+          const self = directory.value.attendees.find((a) => a.isSelf);
           if (self) setMatchProfile(self);
-          try {
-            const result = await requestJson<{ connections: Connection[] }>(`/api/connections?eventSlug=${encodeURIComponent(slug)}`);
-            setConnections(result.connections); setConnectionError(null);
-          } catch { setConnectionError("Could not refresh introductions. Your last confirmed requests are shown; please retry."); }
         })
         .finally(() => {
           refreshPending.current = null;
@@ -160,11 +221,32 @@ export function EventExperience({ slug, initialEvent }: Props) {
 
   useEffect(() => {
     let active = true;
+    if (!demoMode)
+      void requestJson<{ enabled: boolean }>("/api/auth/linkedin")
+        .then((result) => {
+          if (active) setLinkedinAvailable(result.enabled);
+        })
+        .catch(() => {
+          if (active) setLinkedinAvailable(false);
+        });
     void (async () => {
       try {
         // Storage and authenticated membership are external sources of truth.
         await Promise.resolve();
         if (!active) return;
+        const signin = new URLSearchParams(window.location.search).get(
+          "signin",
+        );
+        if (signin === "cancelled")
+          setError(
+            "LinkedIn sign-in was cancelled. You can try again or join as a guest.",
+          );
+        if (signin === "join-failed")
+          setError("You're signed in. Event entry did not finish; tap join to retry.");
+        if (signin === "failed")
+          setError(
+            "LinkedIn sign-in did not complete. Please try again or join as a guest.",
+          );
         if (demoMode) {
           const member = getDemoMember(slug);
           setJoined(!!member);
@@ -173,12 +255,35 @@ export function EventExperience({ slug, initialEvent }: Props) {
         } else {
           const result = await ensureSession();
           if (result.error) throw new Error(result.error);
-          const { membership, profile } = await requestJson<{
+          const {
+            membership,
+            profile,
+            identity: restoredIdentity,
+          } = await requestJson<{
             membership: { visible: boolean } | null;
-            profile: MatchProfile | null;
+            profile:
+              | (MatchProfile & {
+                  displayName: string;
+                  avatarSeed: string;
+                  avatarUrl?: string | null;
+                  linkedinUrl?: string | null;
+                })
+              | null;
+            identity: LinkedInIdentity | null;
           }>(`/api/me?eventSlug=${encodeURIComponent(slug)}`);
           if (!active) return;
-          if (profile) setMatchProfile(profile);
+          setIdentity(restoredIdentity ?? null);
+          if (profile) {
+            setMatchProfile(profile);
+            setJoinInitial({
+              displayName: profile.displayName,
+              avatarSeed: profile.avatarSeed,
+              linkedinUrl: profile.linkedinUrl ?? "",
+              building: profile.building ?? "",
+              canHelpWith: profile.canHelpWith ?? "",
+              lookingFor: profile.lookingFor ?? "",
+            });
+          }
           setJoined(!!membership);
           setVisible(membership?.visible ?? false);
           if (membership) await refreshAttendees();
@@ -206,7 +311,14 @@ export function EventExperience({ slug, initialEvent }: Props) {
           setSyncError("Could not update attendees. Reconnecting…");
         });
     };
-    if (demoMode) return subscribeDemoPool(slug, refresh);
+    if (demoMode) {
+      const unsubscribe = subscribeDemoPool(slug, refresh);
+      const timer = window.setInterval(refresh, 3000);
+      return () => {
+        unsubscribe();
+        window.clearInterval(timer);
+      };
+    }
 
     const supabase = createClient();
     const channel = supabase
@@ -232,6 +344,26 @@ export function EventExperience({ slug, initialEvent }: Props) {
     };
   }, [demoMode, joined, refreshAttendees, slug]);
 
+  async function startLinkedIn() {
+    if (busy || !linkedinAvailable) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const { url } = await requestJson<{ url: string }>("/api/auth/linkedin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventSlug: slug, shareProfile: true }),
+      });
+      window.location.assign(url);
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "Could not start LinkedIn sign-in.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleJoin(values: JoinFormValues) {
     setBusy(true);
     setError(null);
@@ -252,7 +384,11 @@ export function EventExperience({ slug, initialEvent }: Props) {
           venueLat: event.venueLat,
           venueLng: event.venueLng,
         });
-        setMatchProfile({ building: values.building, canHelpWith: values.canHelpWith, lookingFor: values.lookingFor });
+        setMatchProfile({
+          building: values.building,
+          canHelpWith: values.canHelpWith,
+          lookingFor: values.lookingFor,
+        });
         setJoined(true);
         setVisible(values.visible);
         setAttendees(listDemoAttendees(slug));
@@ -278,7 +414,11 @@ export function EventExperience({ slug, initialEvent }: Props) {
         }),
       });
 
-      setMatchProfile({ building: values.building, canHelpWith: values.canHelpWith, lookingFor: values.lookingFor });
+      setMatchProfile({
+        building: values.building,
+        canHelpWith: values.canHelpWith,
+        lookingFor: values.lookingFor,
+      });
       setJoined(true);
       setVisible(values.visible);
       await refreshAttendees();
@@ -351,7 +491,11 @@ export function EventExperience({ slug, initialEvent }: Props) {
   async function askGrok(query?: string) {
     if (demoMode) {
       const self = getDemoMember(slug);
-      const matches = query ? recommendRules(attendees, query) : self ? recommendForProfile(self, attendees) : [];
+      const matches = query
+        ? recommendRules(attendees, query)
+        : self
+          ? recommendForProfile(self, attendees)
+          : [];
       return { matches, source: "rules" };
     }
     return requestJson<{ matches: RecommendResult[]; source: string }>(
@@ -364,19 +508,39 @@ export function EventExperience({ slug, initialEvent }: Props) {
     );
   }
 
-  async function saveMatchProfile(values: { building: string; canHelpWith: string; lookingFor: string }) {
+  async function saveMatchProfile(values: {
+    building: string;
+    canHelpWith: string;
+    lookingFor: string;
+  }) {
     if (demoMode) updateDemoProfile(slug, values);
-    else await requestJson("/api/me", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ eventSlug: slug, ...values }) });
+    else
+      await requestJson("/api/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventSlug: slug, ...values }),
+      });
     setMatchProfile(values);
     await refreshAttendees();
   }
   function recordConnection(connection: Connection) {
-    setConnections((current) => [connection, ...current.filter((c) => c.id !== connection.id)]);
+    setConnections((current) => [
+      connection,
+      ...current.filter((c) => c.id !== connection.id),
+    ]);
   }
   async function requestIntroduction(targetMembershipId: string) {
-    if (demoMode) recordConnection(createDemoConnection(slug, targetMembershipId));
+    if (demoMode)
+      recordConnection(createDemoConnection(slug, targetMembershipId));
     else {
-      const result = await requestJson<{ connection: Connection }>("/api/connections", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ eventSlug: slug, targetMembershipId }) });
+      const result = await requestJson<{ connection: Connection }>(
+        "/api/connections",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ eventSlug: slug, targetMembershipId }),
+        },
+      );
       recordConnection(result.connection);
     }
     await refreshAttendees();
@@ -384,7 +548,14 @@ export function EventExperience({ slug, initialEvent }: Props) {
   async function updateIntroduction(id: string, action: ConnectionAction) {
     if (demoMode) recordConnection(updateDemoConnection(slug, id, action));
     else {
-      const result = await requestJson<{ connection: Connection }>(`/api/connections/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(action) });
+      const result = await requestJson<{ connection: Connection }>(
+        `/api/connections/${id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(action),
+        },
+      );
       recordConnection(result.connection);
     }
     await refreshAttendees();
@@ -419,7 +590,15 @@ export function EventExperience({ slug, initialEvent }: Props) {
               {error}
             </p>
           )}
-          <JoinCard eventName={event.name} onSubmit={handleJoin} busy={busy} />
+          <JoinCard
+            eventName={event.name}
+            initial={joinInitial}
+            identity={identity}
+            linkedinAvailable={linkedinAvailable}
+            onLinkedIn={startLinkedIn}
+            onSubmit={handleJoin}
+            busy={busy}
+          />
           <p className="join-bottom-note">
             Made for moments that turn into something.
           </p>
@@ -443,7 +622,7 @@ export function EventExperience({ slug, initialEvent }: Props) {
             </button>
             <button
               type="button"
-              onClick={() => void leaveEvent()}
+              onClick={() => setLeaveOpen(true)}
               disabled={busy}
               className="icon-button"
               aria-label="Leave"
@@ -512,17 +691,20 @@ export function EventExperience({ slug, initialEvent }: Props) {
                 name: event.venueName,
               }}
               attendees={attendees}
-              selectedId={selected?.membershipId ?? null}
+              selectedId={focusedMatchId ?? selected?.membershipId ?? null}
+              matchedIds={currentConciergeMatches.map(match=>match.membershipId)}
+              className={currentConciergeMatches.length ? conciergeStyles.mapWithMatches : undefined}
               onSelectAttendee={selectAttendee}
               onSelectEvent={() => setEventOpen(true)}
             />
+            <MapMatches matches={currentConciergeMatches} attendees={attendees} focusedId={focusedMatchId} onFocus={focusConciergeMatch} onOpen={selectAttendee} onClear={()=>{setConciergeMatches([]);setFocusedMatchId(null);}} />
             <p className="map-disclaimer">
               Venue-based markers · no GPS collected
             </p>
           </div>
         )}
       </main>
-      <nav className="bottom-dock" aria-label="Event navigation">
+      <nav className={`bottom-dock ${conciergeStyles.dock}`} aria-label="Event navigation">
         <button
           type="button"
           className={`dock-item ${view === "people" ? "active" : ""}`}
@@ -541,6 +723,7 @@ export function EventExperience({ slug, initialEvent }: Props) {
           <MapIcon size={21} />
           <span>Map</span>
         </button>
+        <ConciergePanel slug={slug} visible={visible} demoMode={demoMode} attendees={attendees} onAsk={askConcierge} onMatches={showConciergeMatches} onFocus={focusConciergeMatch} />
         <AskGrokPanel
           onAsk={askGrok}
           profile={matchProfile}
@@ -571,6 +754,34 @@ export function EventExperience({ slug, initialEvent }: Props) {
         open={eventOpen}
         onOpenChange={setEventOpen}
       />
+      <MobileSheet
+        open={leaveOpen}
+        onOpenChange={setLeaveOpen}
+        title="Leave this event?"
+        description="You’ll disappear from the map, and open introductions and stage links stop working."
+        closeLabel="Stay"
+      >
+        <div className="leave-actions">
+          <button
+            type="button"
+            className="primary-button"
+            onClick={() => setLeaveOpen(false)}
+          >
+            Stay in the room
+          </button>
+          <button
+            type="button"
+            className="secondary-button danger-button"
+            disabled={busy}
+            onClick={() => {
+              setLeaveOpen(false);
+              void leaveEvent();
+            }}
+          >
+            <LogOut size={18} /> Leave event
+          </button>
+        </div>
+      </MobileSheet>
     </div>
   );
 }

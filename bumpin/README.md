@@ -1,49 +1,73 @@
-# BumpIn
+# BumpIn × Love at First Bot
 
-Mobile-first QR web app for opt-in event networking — live attendee map, profile sheets, and transparent rules-based introductions. The optional Grok adapter requires a verified API and credentials.
+**Less small talk. More shipping.** Opt-in event networking with explained collaborator matches, mutual introductions and a consented big-screen reveal. Built for Track 2 — Know Your Members.
 
-**Event:** [Grok Bot Community Engineering London Hackathon](https://luma.com/eveur09a) · `/e/grok-bot-london`
+## The experience
 
-## Live demo
+1. Open the event QR and tap **Join with LinkedIn**. Once configured, authorization imports name/photo and enters the event automatically. LinkedIn and guest entry appear on the attendee map automatically; the action explains sharing, and Hide/Leave remain available. There are no profile fields or checkboxes before entry.
+2. Open **Find my collaborator** and optionally choose what you offer and need. Mutual offers/needs rank ahead of one-way help and shared project interests. Exact profile excerpts explain each suggestion; there are no compatibility percentages.
+3. Request an introduction. The recipient accepts or passes; the sender can withdraw. An accepted pair receives an opening line and a suggested ten-minute collaboration task.
+4. Optionally take the match to the stage. Each person can select a curated joke about themselves. Both must approve the exact preview before the link exposes attendee details.
+5. Open the approved stage link on a laptop and reveal. Either participant can revoke stage permission. Hiding or leaving also removes stage access.
 
-- **App:** https://bumpin-silk.vercel.app  
-- **Event:** https://bumpin-silk.vercel.app/e/grok-bot-london  
-- **QR:** https://bumpin-silk.vercel.app/qr  
+Profiles are self-declared. Matching and copy use local rules/templates. The [Grok Bot MCP connector](docs/GROK-BOT-CONNECTION.md) exposes public event tools and optional, explicitly authorized event-scoped attendee matching. The separate xAI voice concierge has its own activation requirements. Acceptance does not prove a meeting or collaboration occurred.
 
-## Quick start
+## Run
 
-```bash
+The **Concierge** tab adds voice or typed requests, profile-grounded reasons and matched venue markers. Paid voice and AI matching require owner approval through **Request access**; free basic typed matching remains available. Live xAI access also requires a separate key and feature flag, disabled by default. See [access administration](docs/PAID-ACCESS.md) and [concierge setup and verification](docs/VOICE-CONCIERGE.md) for actual release/provider evidence.
+
+```sh
 cp .env.example .env.local
-# Add Supabase + DATABASE_URL (see docs/DEPLOYMENT-LOCAL.md / SUPABASE-SETUP.md)
+# Configure Supabase URL, publishable key, DATABASE_URL and app URL.
+# Apply all SQL migrations in filename order (see below).
+npm install
 npm run dev
 ```
 
-- Join: http://localhost:3000/e/grok-bot-london
-- QR helper: http://localhost:3000/qr
+- Event: `/e/grok-bot-london`
+- QR: `/qr`
+- Approved stage: `/e/grok-bot-london/show/<connection-id>`
 
-Without Supabase env vars, the app runs in **demo mode** (localStorage + BroadcastChannel, tabs within the same browser only). Each tab has its own session identity; refresh restores membership, and hiding preserves profile details.
+With Supabase disabled, preview mode uses localStorage and BroadcastChannel, with per-tab identities. It syncs only tabs within one browser, not separate devices. Preview storage is a development convenience, not a security boundary. No attendees are seeded automatically.
 
-Markers are arranged around the venue. This build does not request or collect GPS. Apply all SQL migrations in order; `20261022180000_venue_only_positions.sql` removes previously stored client positions and enforces venue-based placement for direct database writes.
+## Database setup
 
-Cross-device updates use Realtime plus a three-second refresh through the membership-protected attendee endpoint. If map loading fails, attendees remain accessible in a list.
+Apply every SQL file in `supabase/migrations/` in filename order. Existing installations need:
 
-## Phone interface
+- `20261022180000_venue_only_positions.sql` — discards old client positions and enforces venue offsets for all database writes.
+- `20261022190000_love_at_first_bot.sql` — adds offers, connection state, participant-only RPCs, versioned stage approval and a safe public stage projection.
+- `20261022200000_linkedin_onboarding.sql` — adds the optional identity photo and safe attendee projection.
+- `20261022210000_concierge_quota.sql` and `20261022230000_concierge_quota_grants.sql` — atomic per-member quotas for the optional voice/search concierge; execution is restricted to authenticated members.
+- `20261022220000_bot_connector.sql` — revocable, hashed, read-only credentials for the Grok Bot MCP connector.
+- `20261022240000_concierge_access.sql` — owner-granted access list for the paid concierge endpoints.
 
-People open first, with Map loaded only on demand. The bottom navigation respects safe areas; profile, event and matching sheets scroll within the available viewport. Registration starts with a name and optional map visibility; other profile details are expandable. Controls support keyboard focus, pinch zoom and reduced motion.
+The new attendee RPC shape adds `can_help_with`; old profiles remain valid. Connection tables cannot be read or written directly by browser roles. SQL functions validate participants, transitions, evidence excerpts and preview versions. Profile edits reset stage consent; the request snapshot remains labelled as captured at introduction time.
 
-Without a MapTiler key, the map uses attributed OpenStreetMap street tiles, requested normally by the browser with its HTTP cache; there is no offline download or tile prefetch feature. See the [tile usage policy](https://operations.osmfoundation.org/policies/tiles/). A configured MapTiler key retains the dark MapTiler style. Map failures and a 12-second loading timeout expose an attendee list and retry control.
+Use [Supabase setup](docs/SUPABASE-SETUP.md) for the existing guest-session configuration and [deployment instructions](docs/DEPLOYMENT-LOCAL.md). The tracked SQL is the source of truth; inspect the completion note for what has actually been applied.
 
-## Scripts
+LinkedIn sign-in is prepared but requires a developer app and provider configuration. Follow [LinkedIn onboarding setup](docs/LINKEDIN-ONBOARDING.md). Standard sign-in supplies name/photo, not skills or work history. Guests can join while it is disabled. See [minimal-entry release evidence](docs/MINIMAL-ENTRY-COMPLETION.md) for completed checks and activation limits.
 
-- `npm run dev` — development
-- `npm run build` / `npm start` — production
-- `npm run typecheck` / `npm run lint` / `npm test` — quality gates
-- `npm run test:e2e` — isolated production build in `.next-e2e`, mobile Chromium and WebKit on port 3108, with Supabase disabled; tests seed demo membership without submitting registration
+## Checks
 
-The map worker is copied from the installed MapLibre package into `public/maplibre/` automatically before development and production builds.
+```sh
+npm run typecheck
+npm run lint
+npm test
+npm run test:connections:db
+npm run test:e2e
+npm run build
+```
 
-## Stack
+`test:connections:db` creates and deletes an isolated local PostgreSQL cluster. It **never reads DATABASE_URL**. It defaults to `/opt/homebrew/opt/postgresql@17/bin`; set `BUMPIN_PG_BIN` to another installed PostgreSQL binary directory.
 
-Next.js, MapLibre + react-map-gl, Supabase (Auth, Postgres, Realtime), DiceBear, Vaul, Turf.js.
+End-to-end checks use an isolated `.next-e2e` production build with Supabase disabled. They seed membership without submitting registration, exercise two identities, failure recovery, stage consent/revocation, mobile Chromium/WebKit and desktop layouts. Screenshots/results are saved under `/tmp`. A physical two-phone rehearsal remains necessary.
 
-Agent docs: `AGENTS.md`, `docs/`.
+## Privacy and limits
+
+No GPS is requested. Map markers are arranged around the venue. The directory is limited to event members; hidden attendees are excluded from discovery. Public stage access needs both approvals and is checked every two seconds. The stage clears on a failed check after its five-second timeout; this is not instant revocation of a screenshot someone already saved. Public responses omit contact links, authentication IDs and the private opener.
+
+Prepared jokes target harmless project habits. Personal jokes are optional and require individual approval. No private attendee information belongs in public source control.
+
+Stack: Next.js · TypeScript · Supabase · MapLibre · DiceBear · Vaul. MIT licensed. See the [demo script](docs/DEMO-SCRIPT.md), [track fit](docs/TRACK_FIT.md), [acceptance criteria](docs/LOVE-AT-FIRST-BOT.md) and [completion evidence](docs/LOVE-COMPLETION.md).
+
+Live release: https://bumpin-silk.vercel.app/e/grok-bot-london · QR: https://bumpin-silk.vercel.app/qr. See the completion evidence for verified checks and remaining physical-phone/repository requirements.

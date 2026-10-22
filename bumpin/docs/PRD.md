@@ -15,6 +15,6 @@ Hackathon attendees physically at the event. Scope limited to this hackathon for
 - Grok Bot adapter when actual supported API and permission are confirmed.
 - Additional curated events, then optional compliant Luma integration.
 ## Out of scope
-LinkedIn OAuth/scraping, background location tracking, public global people map, payments, messaging, swipe matching, automatic broad Luma scraping.
+LinkedIn scraping or importing skills/work history (standard LinkedIn sign-in for name and photo is supported once configured; see LINKEDIN-ONBOARDING.md), background location tracking, public global people map, payments, messaging, swipe matching, automatic broad Luma scraping.
 ## Success
 Two devices independently join, updates visible within a few seconds on reasonable connectivity, both can open a profile and event link; no-GPS and revoke-visibility flows pass.

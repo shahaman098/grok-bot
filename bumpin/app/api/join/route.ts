@@ -1,3 +1,4 @@
+import { linkedInIdentity } from "@/lib/auth/linkedin";
 import { NextResponse } from "next/server";
 import { resolveDisplayPosition } from "@/lib/display-position";
 import { joinBodySchema, normalizeLinkedInUrl } from "@/lib/validation";
@@ -43,9 +44,11 @@ export async function POST(request: Request) {
       clientLng: body.clientLng,
     });
 
+    const identity = linkedInIdentity(user);
     const { error: profileError } = await supabase.from("profiles").upsert({
       id: user.id,
-      display_name: body.displayName.trim(),
+      display_name: identity?.displayName ?? body.displayName.trim(),
+      avatar_url: identity?.avatarUrl ?? null,
       linkedin_url: linkedin,
       avatar_seed: body.avatarSeed,
       building: body.building?.trim() || null,
@@ -54,7 +57,10 @@ export async function POST(request: Request) {
     });
 
     if (profileError) {
-      return NextResponse.json({ error: profileError.message }, { status: 500 });
+      return NextResponse.json(
+        { error: profileError.message },
+        { status: 500 },
+      );
     }
 
     const { error: membershipError } = await supabase

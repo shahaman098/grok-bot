@@ -22,7 +22,12 @@ export function getMapStyle(): string | StyleSpecification {
         id: "streets",
         type: "raster",
         source: "streets",
-        paint: { "raster-saturation": -0.4 },
+        // Dim the light OSM tiles so the keyless fallback sits inside the dark UI.
+        paint: {
+          "raster-saturation": -0.6,
+          "raster-brightness-max": 0.5,
+          "raster-contrast": 0.15,
+        },
       },
     ],
   };

@@ -4,3 +4,13 @@ You are implementing BumpIn, a mobile-first, opt-in networking proof of concept.
 Rules: TypeScript strict mode; never commit secrets; validate all input server-side; use Supabase RLS; no unrestricted client writes to other users; keep precise GPS private; don't expose exact live coordinates to strangers; event-level or deliberately coarse positions by default; no GPS without explicit consent. Do not scrape LinkedIn. Use user-entered links only. Link to manually curated Luma event first. Request location only on a user gesture; support denial, timeout and unavailable APIs.
 
 For each task: inspect repo → write acceptance criteria → implement smallest vertical slice → run typecheck/lint/tests → record evidence in a short completion note. If blocked, implement a documented fallback. Do not fabricate test results or deploy success. Ask humans only for accounts, API keys, approvals and unavailable facts.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

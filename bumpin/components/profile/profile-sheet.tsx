@@ -40,7 +40,11 @@ export function ProfileSheet({
       }
     >
       <div className="profile-identity">
-        <Avatar seed={attendee.avatarSeed} size={80} />
+        <Avatar
+          seed={attendee.avatarSeed}
+          photo={attendee.avatarUrl}
+          size={80}
+        />
         <span className="profile-badge">
           <MapPin size={14} /> At this event
         </span>
@@ -52,7 +56,12 @@ export function ProfileSheet({
           <p>{attendee.building}</p>
         </section>
       )}
-      {attendee.canHelpWith && <section className="profile-section"><h3>CAN HELP WITH</h3><p>{attendee.canHelpWith}</p></section>}
+      {attendee.canHelpWith && (
+        <section className="profile-section">
+          <h3>CAN HELP WITH</h3>
+          <p>{attendee.canHelpWith}</p>
+        </section>
+      )}
       {attendee.lookingFor && (
         <section className="profile-section">
           <h3>LOOKING FOR</h3>

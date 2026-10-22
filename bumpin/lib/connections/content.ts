@@ -5,8 +5,14 @@ export const HOST_LINES = [
 ] as const;
 
 export const PERSONAL_JOKES = [
-  { id: "tabs", text: "My superpower? Turning one good idea into 47 open tabs." },
-  { id: "final", text: "My project is called final_final. This is not its final form." },
+  {
+    id: "tabs",
+    text: "My superpower? Turning one good idea into 47 open tabs.",
+  },
+  {
+    id: "final",
+    text: "My project is called final_final. This is not its final form.",
+  },
   { id: "coffee", text: "I turn coffee into ambitious project timelines." },
 ] as const;
 export type JokeId = (typeof PERSONAL_JOKES)[number]["id"];

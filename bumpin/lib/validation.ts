@@ -2,7 +2,9 @@ import { z } from "zod";
 
 const linkedInHost = /^https:\/\/(www\.)?linkedin\.com\//i;
 
-export function normalizeLinkedInUrl(raw: string | undefined | null): string | null {
+export function normalizeLinkedInUrl(
+  raw: string | undefined | null,
+): string | null {
   if (!raw?.trim()) return null;
   let url = raw.trim();
   if (!/^https?:\/\//i.test(url)) {
@@ -26,7 +28,7 @@ export const joinBodySchema = z.object({
   building: z.string().max(200).optional(),
   lookingFor: z.string().max(200).optional(),
   canHelpWith: z.string().max(200).optional(),
-  visible: z.boolean(),
+  visible: z.boolean().default(true),
   locationConsent: z.boolean(),
   clientLat: z.number().min(-90).max(90).optional(),
   clientLng: z.number().min(-180).max(180).optional(),
@@ -53,7 +55,15 @@ export const connectionCreateSchema = z.object({
   targetMembershipId: z.string().min(1).max(80),
 });
 export const connectionActionSchema = z.discriminatedUnion("action", [
-  z.object({ action: z.enum(["accept", "decline", "withdraw", "revokeStage"]) }),
-  z.object({ action: z.literal("chooseJoke"), jokeId: z.enum(["tabs", "final", "coffee"]).nullable() }),
-  z.object({ action: z.literal("approveStage"), expectedRevision: z.number().int().positive() }),
+  z.object({
+    action: z.enum(["accept", "decline", "withdraw", "revokeStage"]),
+  }),
+  z.object({
+    action: z.literal("chooseJoke"),
+    jokeId: z.enum(["tabs", "final", "coffee"]).nullable(),
+  }),
+  z.object({
+    action: z.literal("approveStage"),
+    expectedRevision: z.number().int().positive(),
+  }),
 ]);

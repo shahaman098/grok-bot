@@ -5,3 +5,18 @@ Default: no GPS required. Display event-anchored approximate markers rather than
 
 
 Current implementation: no browser geolocation is requested. The server always computes venue-based offsets. Apply `20261022180000_venue_only_positions.sql` to scrub old positions and enforce this rule for direct authenticated database writes as well. The migration has not been applied to production by the local review.
+
+## Love at First Bot
+
+- External AI processing is disabled by default; legacy GROK_BOT_API_* placeholders never activate it. The optional voice concierge requires its separate server-side xAI key, feature flag and quota migration. When enabled it processes microphone audio and shared event-profile excerpts, with an explanation in the concierge interface. Private introductions and stage snapshots are excluded. See [voice concierge setup](VOICE-CONCIERGE.md).
+- Connection tables have RLS and no direct grants to browser roles. Security-definer RPCs use fixed search paths, caller identity and locked transactional transitions. Request evidence excerpts are checked against the participants' stored profiles.
+- The directory's opaque attendee identifier is resolved inside the same event. Self, hidden and non-member targets are rejected. A unique unordered pair prevents duplicate requests.
+- Stage sharing is separate from event visibility and introduction acceptance. Each person previews and approves the same revision. Jokes are curated and may be skipped. Joke/profile edits reset stage permissions.
+- Public stage RPCs expose only the approved projection. Browser/API responses use no-store. Stage polling clears attendee details after revocation is observed, and clears on permission-check errors; network timeout is five seconds. Revocation cannot recall previously captured screenshots.
+- Hide withdraws active connections; leave cascades their deletion. The frozen request snapshot is labelled as captured at introduction time; profile edits require renewed stage approval.
+- New introduction mutations require JSON and reject cross-origin Origin headers. Render all supplied text through React text nodes, never raw HTML.
+- Preview localStorage deliberately has no authentication security guarantees; it is labelled as a single-browser development mode.
+
+## Grok Bot MCP connector
+
+Public tools expose event metadata and an individually requested, mutually approved stage snapshot. Private tools use a random event-scoped token, stored only as a SHA-256 digest. The credential expires after one hour; replacement, revocation, hiding or leaving invalidates it. No Supabase session, refresh token or admin credential is shared with Grok Bot. Each read checks current visibility and event membership. Results exclude contact links, coordinates, authentication IDs and private introductions. The connector has no write tools. Consent explains that already-read information can remain in Grok Bot conversation history. See [connection setup](GROK-BOT-CONNECTION.md).
