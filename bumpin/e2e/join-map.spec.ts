@@ -47,7 +47,7 @@ test("restores membership, preserves hidden profile, and removes the leaver", as
   await expect(
     page.getByRole("button", { name: "Visible", exact: true }),
   ).toBeVisible();
-  await expect(page.getByText("1 on map", { exact: true })).toBeVisible();
+  await expect(page.getByText("2 on map", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Visible", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Hidden", exact: true }),
@@ -98,7 +98,7 @@ test("offers rules-based matching and excludes your own profile", async ({
   page,
 }) => {
   await page.goto("/e/grok-bot-london");
-  await page.getByRole("button", { name: "Find people to meet" }).click();
+  await page.getByRole("button", { name: "Introductions – find people to meet", exact: true }).click();
   await page
     .getByText("Or search for a skill or project", { exact: true })
     .click();

@@ -1,0 +1,44 @@
+.person-entry {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+}
+.person-entry .person-card {
+  border: 0;
+  border-radius: 0;
+}
+.person-linkedin {
+  padding: 0 16px;
+  border-top: 1px solid var(--line);
+}
+.person-linkedin-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 0;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+}
+.person-linkedin-action svg {
+  flex-shrink: 0;
+}
+.person-linkedin-action:hover {
+  text-decoration: underline;
+}
+.person-entry :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+}
+.person-linkedin-missing {
+  padding: 12px 0;
+  color: var(--muted);
+  font-size: 12px;
+}

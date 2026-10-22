@@ -49,6 +49,7 @@ export async function eventContext(eventSlug: string) {
 
 export async function publicAttendees(
   context: Awaited<ReturnType<typeof eventContext>>,
+  options: { includeSelf?: boolean } = {},
 ) {
   const { data, error } = await context.client.rpc("list_event_attendees", {
     p_event_slug: context.eventSlug,
@@ -57,7 +58,9 @@ export async function publicAttendees(
     throw new ConciergeError("Could not load attendees. Please retry.", 503);
   return ((data ?? []) as Parameters<typeof mapAttendeeRow>[0][])
     .map(mapAttendeeRow)
-    .filter((a): a is PublicAttendee => !!a && !a.isSelf);
+    .filter(
+      (a): a is PublicAttendee => !!a && (options.includeSelf === true || !a.isSelf),
+    );
 }
 
 export async function claimQuota(

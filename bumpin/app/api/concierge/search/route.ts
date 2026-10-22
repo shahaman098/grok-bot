@@ -3,7 +3,7 @@ import { z } from "zod";
 import { mutationGuard } from "@/lib/connections/api";
 import { conciergeEnabled } from "@/lib/concierge/config";
 import { requireConciergeAccess } from "@/lib/concierge/access";
-import { semanticMatches } from "@/lib/concierge/matching";
+import { semanticMatches, sharedProfileForMatching } from "@/lib/concierge/matching";
 import {
   claimQuota,
   ConciergeError,
@@ -32,20 +32,31 @@ export async function POST(request: Request) {
         { status: 400, headers: noStore },
       );
     const context = await eventContext(body.data.eventSlug);
-    const attendees = await publicAttendees(context);
+    const directory = await publicAttendees(context, { includeSelf: true });
+    const self = directory.find((a) => a.isSelf);
+    const attendees = directory.filter((a) => !a.isSelf);
     let fallbackReason =
       "AI isn’t connected yet. Showing basic profile-term matches.";
     if (conciergeEnabled()) {
       try {
         await requireConciergeAccess(context);
         await claimQuota(context, "search");
-        const results = await semanticMatches(attendees, body.data.query);
+        const results = await semanticMatches(attendees, body.data.query, self);
         // Visibility or profile evidence may change while the provider is running.
         const current = await publicAttendees(
           await eventContext(body.data.eventSlug),
+          { includeSelf: true },
         );
+        const currentSelf = current.find((a) => a.isSelf);
+        if (
+          JSON.stringify(sharedProfileForMatching(self)) !==
+          JSON.stringify(sharedProfileForMatching(currentSelf))
+        )
+          throw new ConciergeError("Shared profile changed during search.", 409);
         const matches = results.filter((m) => {
-          const person = current.find((a) => a.membershipId === m.membershipId);
+          const person = current.find(
+            (a) => !a.isSelf && a.membershipId === m.membershipId,
+          );
           return (
             person &&
             m.evidence.every((e) =>
@@ -65,7 +76,9 @@ export async function POST(request: Request) {
         fallbackReason =
           error instanceof ConciergeError && error.status === 403
             ? "Request access for AI matching. Showing free basic profile-term matches."
-            : "AI matching is unavailable for now. Showing basic profile-term matches.";
+            : error instanceof ConciergeError && error.status === 409
+              ? "Your shared profile changed during this search. Try again for updated AI matches. Showing basic matches."
+              : "AI matching is unavailable for now. Showing basic profile-term matches.";
       }
     }
     const current = await publicAttendees(

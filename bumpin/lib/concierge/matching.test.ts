@@ -20,8 +20,7 @@ const result = {
   matches: [
     {
       membershipId: "ada",
-      field: "canHelpWith",
-      quote: "Speech recognition",
+      evidence: [{ field: "canHelpWith", quote: "Speech recognition" }],
       relevance: 90,
     },
   ],
@@ -73,7 +72,7 @@ describe("evidence-grounded semantic matching", () => {
       validateSemanticMatches(
         {
           ...result,
-          matches: [{ ...result.matches[0], quote: "I built Whisper" }],
+          matches: [{ ...result.matches[0], evidence: [{ field: "canHelpWith", quote: "I built Whisper" }] }],
         },
         [ada],
         "speech",
@@ -84,7 +83,7 @@ describe("evidence-grounded semantic matching", () => {
     const request = {
       ...result,
       matches: [
-        { ...result.matches[0], field: "lookingFor", quote: "A designer" },
+        { ...result.matches[0], evidence: [{ field: "lookingFor", quote: "A designer" }] },
       ],
     };
     expect(() =>
@@ -106,6 +105,21 @@ describe("evidence-grounded semantic matching", () => {
         "quantum optics",
       ),
     ).toEqual([]);
+  });
+  it("combines distinct field quotes and invalidates a match if either quote changes", () => {
+    const richer = { ...result, matches: [{ ...result.matches[0], evidence: [
+      { field: "building", quote: "Audio agents" },
+      { field: "canHelpWith", quote: "Speech recognition" },
+    ] }] };
+    const matches = validateSemanticMatches(richer, [ada], "A speech collaborator");
+    expect(matches[0].evidence.map((e) => e.profileField)).toEqual(["canHelpWith", "building"]);
+    expect(matches[0].reason).toContain("Speech recognition");
+    expect(matches[0].reason).toContain("Audio agents");
+    expect(availableMatches(matches, [{ ...ada, building: "Unrelated project" }])).toEqual([]);
+    expect(() => validateSemanticMatches({ ...result, matches: [{ ...result.matches[0], evidence: [
+      result.matches[0].evidence[0], result.matches[0].evidence[0],
+    ] }] }, [ada], "speech")).toThrow("Duplicate evidence field");
+    expect(() => validateSemanticMatches({ ...result, matches: [{ ...result.matches[0], evidence: [] }] }, [ada], "speech")).toThrow();
   });
   it("sends only profile fields and validates structured provider responses", async () => {
     vi.stubEnv("XAI_API_KEY", "test-provider-key");
@@ -130,7 +144,23 @@ describe("evidence-grounded semantic matching", () => {
       lookingFor: "A designer",
     });
     expect(body.store).toBe(false);
+    expect(data.viewerProfile).toBeNull();
     expect(matches[0].evidence[0].theirExcerpt).toBe("Speech recognition");
+  });
+  it("uses only the caller's shared matching fields for personalized ranking", async () => {
+    const fetcher = vi.fn().mockResolvedValue(Response.json({ output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(result) }] }] }));
+    vi.stubGlobal("fetch", fetcher);
+    const viewer: PublicAttendee = { ...ada, isSelf: true, membershipId: "self", displayName: "PRIVATE NAME",
+      linkedinUrl: "https://www.linkedin.com/in/private-contact", building: "A voice assistant", canHelpWith: "Product design", lookingFor: "Audio engineering", displayLat: 47.1234567 };
+    await semanticMatches([viewer, ada], "Who should I meet?", viewer);
+    const body = JSON.parse(fetcher.mock.calls[0][1].body);
+    const data = JSON.parse(body.input[1].content);
+    expect(data.viewerProfile).toEqual({ building: "A voice assistant", canHelpWith: "Product design", lookingFor: "Audio engineering" });
+    expect(data.profiles).toHaveLength(1);
+    expect(data.profiles[0].membershipId).toBe("ada");
+    for (const secret of ["PRIVATE NAME", "private-contact", "47.1234567", "avatarSeed", "linkedinUrl"])
+      expect(body.input[1].content).not.toContain(secret);
+    expect(body.input[0].content).toContain("explicit request takes priority");
   });
   it("rejects provider failures without exposing their response body", async () => {
     vi.stubGlobal(

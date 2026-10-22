@@ -64,7 +64,7 @@ End-to-end checks use an isolated `.next-e2e` production build with Supabase dis
 
 ## Privacy and limits
 
-No GPS is requested. Map markers are arranged around the venue. The directory is limited to event members; hidden attendees are excluded from discovery. Public stage access needs both approvals and is checked every two seconds. The stage clears on a failed check after its five-second timeout; this is not instant revocation of a screenshot someone already saved. Public responses omit contact links, authentication IDs and the private opener.
+Map markers for attendees are arranged around the venue. **Map → Locate me** optionally requests your own position after a tap and browser permission; its private dot is never saved or sent to BumpIn, other attendees or the concierge. It clears when hidden, when leaving the map or when the page backgrounds. The directory is limited to event members; hidden attendees are excluded from discovery. Public stage access needs both approvals and is checked every two seconds. The stage clears on a failed check after its five-second timeout; this is not instant revocation of a screenshot someone already saved. Public responses omit contact links, authentication IDs and the private opener.
 
 Prepared jokes target harmless project habits. Personal jokes are optional and require individual approval. No private attendee information belongs in public source control.
 

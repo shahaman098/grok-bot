@@ -2,7 +2,9 @@
 
 import { Avatar } from "@/components/ui/avatar";
 import type { PublicAttendee } from "@/lib/types";
+import { normalizeLinkedInUrl } from "@/lib/validation";
 import { ArrowUpRight, Share2, UsersRound } from "lucide-react";
+import "./attendee-list.css";
 
 type Props = {
   attendees: PublicAttendee[];
@@ -10,7 +12,7 @@ type Props = {
   onShare?: () => void;
 };
 export function AttendeeList({ attendees, onSelect, onShare }: Props) {
-  const people = attendees.filter((a) => !a.isSelf);
+  const people = attendees;
   return (
     <div className="people-view">
       <div className="people-intro">
@@ -19,7 +21,7 @@ export function AttendeeList({ attendees, onSelect, onShare }: Props) {
           In good company<span className="accent">.</span>
         </h1>
         <p className="muted">
-          Find a familiar interest. Start a new conversation.
+          Explore shared profiles and connect on LinkedIn.
         </p>
       </div>
       <div className="section-heading">
@@ -50,38 +52,62 @@ export function AttendeeList({ attendees, onSelect, onShare }: Props) {
         </div>
       ) : (
         <ul className="people-grid">
-          {people.map((person) => (
-            <li key={person.membershipId}>
-              <button
-                type="button"
-                className="person-card"
-                aria-label={`Open profile for ${person.displayName}`}
-                onClick={() => onSelect(person)}
-              >
-                <Avatar
-                  seed={person.avatarSeed}
-                  photo={person.avatarUrl}
-                  size={56}
-                />
-                <span className="person-copy">
-                  <span className="person-name">{person.displayName}</span>
-                  <span className="person-detail">
-                    {person.building ||
-                      person.lookingFor ||
-                      "Here to connect. Start with a hello."}
+          {people.map((person) => {
+            const linkedinUrl = normalizeLinkedInUrl(person.linkedinUrl);
+            return (
+              <li key={person.membershipId} className="person-entry">
+                <button
+                  type="button"
+                  className="person-card"
+                  aria-label={`Open profile for ${person.displayName}`}
+                  onClick={() => onSelect(person)}
+                >
+                  <Avatar
+                    seed={person.avatarSeed}
+                    photo={person.avatarUrl}
+                    size={56}
+                  />
+                  <span className="person-copy">
+                    <span className="person-name">{person.displayName}{person.isSelf && " · You"}</span>
+                    {person.building && <span className="person-detail">Building: {person.building}</span>}
+                    {person.canHelpWith && <span className="person-detail">Can help: {person.canHelpWith}</span>}
+                    {person.lookingFor && <span className="person-detail">Looking for: {person.lookingFor}</span>}
+                    {!person.building && !person.canHelpWith && !person.lookingFor && (
+                      <span className="person-detail">{person.isSelf ? "Add your project, offers and needs in Introductions." : "No profile details shared yet. Tap to say hello."}</span>
+                    )}
+                    <span className="person-tag">
+                      {person.isSelf
+                        ? "Your visible profile"
+                        : person.building
+                        ? "Building something"
+                        : person.canHelpWith
+                          ? "Here to help"
+                        : person.lookingFor
+                          ? "Looking to connect"
+                          : "At this event"}
+                    </span>
                   </span>
-                  <span className="person-tag">
-                    {person.building
-                      ? "Building something"
-                      : person.lookingFor
-                        ? "Looking to connect"
-                        : "At this event"}
-                  </span>
-                </span>
-                <ArrowUpRight className="person-arrow" size={20} />
-              </button>
-            </li>
-          ))}
+                  <ArrowUpRight className="person-arrow" size={20} />
+                </button>
+                <div className="person-linkedin">
+                  {linkedinUrl ? (
+                    <a href={linkedinUrl} target="_blank" rel="noopener noreferrer"
+                      className="person-linkedin-action"
+                      aria-label={person.isSelf ? "View your LinkedIn profile" : `Connect with ${person.displayName} on LinkedIn`}>
+                      {person.isSelf ? "View your LinkedIn profile" : "Connect on LinkedIn"}
+                      <ArrowUpRight size={16} aria-hidden="true" />
+                    </a>
+                  ) : person.isSelf ? (
+                    <button type="button" className="person-linkedin-action" onClick={() => onSelect(person)}>
+                      Add your LinkedIn link <ArrowUpRight size={16} aria-hidden="true" />
+                    </button>
+                  ) : (
+                    <p className="person-linkedin-missing">LinkedIn link not shared yet</p>
+                  )}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
       <p className="list-footnote">

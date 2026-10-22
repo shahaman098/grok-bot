@@ -3,7 +3,8 @@
 ## Acceptance criteria
 
 - Joined, visible attendees can start an explicitly activated live voice session, see captions, mute, interrupt and end it.
-- A spoken request produces at most three eligible attendees, each with a reason backed by an exact shared-profile excerpt; the same matches are highlighted on the venue map.
+- A spoken request produces at most three eligible attendees, each with one or two exact quotes from distinct shared-profile fields; the same matches are highlighted on the venue map.
+- Broad requests such as “Who should I meet?” use the caller’s shared offers, project and goals to find complementary people. An explicit request takes priority over saved goals. LinkedIn links provide no career/skill evidence.
 - Follow-up questions and focusing a result work while viewing the map. No precise-location claims or automatic introduction requests.
 - Missing credentials, microphone denial, provider failures and map failures retain useful typed/basic matching.
 - Existing onboarding, mutual introductions and stage permissions remain intact.
@@ -17,7 +18,7 @@ The Concierge navigation item opens live conversation or typed search without re
 
 - `GET /api/concierge/config` reports whether voice is enabled, without credentials.
 - `POST /api/concierge/session { eventSlug }` verifies visible event membership and quota, then mints a 60-second xAI connection credential. The browser opens a direct WebSocket, sends session settings and streams 24 kHz PCM using an AudioWorklet. The long-lived key never enters browser code.
-- `POST /api/concierge/search { eventSlug, query }` checks the same membership boundary, loads the existing public attendee projection and requests structured semantic results. Exact quoted evidence, returned IDs and renewed visibility are checked on the server. Text-model input excludes names, contact links and coordinates; the voice model receives verified result names and excerpts.
+- `POST /api/concierge/search { eventSlug, query }` checks the same membership boundary, loads the existing public attendee projection and requests structured semantic results. Exact quoted evidence, returned IDs and renewed visibility are checked on the server. Text-model input contains candidate IDs and shared offers/projects/goals, plus the caller’s shared offers/projects/goals for context. It excludes names, contact links and coordinates; the voice model receives verified result names and excerpts. Candidate quotes and caller context are revalidated after the provider returns so a profile edit cannot leave stale matches.
 - A profile's `lookingFor` text is not accepted as expertise. Related projects are labelled as relevance rather than confirmed skills. Provider errors and missing AI configuration return explicitly labelled basic matches; a genuine empty AI result stays empty.
 - Voice tools can only search or focus a current result. They cannot create introductions, publish stage content or edit profiles.
 - Atomic database quotas permit three connection credentials and twelve semantic searches per member/event/minute. Existing queryless profile matching and introduction eligibility remain rules-based.

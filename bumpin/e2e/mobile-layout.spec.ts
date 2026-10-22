@@ -6,6 +6,11 @@ test.beforeEach(async ({ page }) => {
   const messages: string[] = [];
   errors.set(page, messages);
   page.on("pageerror", (error) => messages.push(error.message));
+  // Layout fixtures have no real account. Keep unrelated access polling local;
+  // WebKit can report an in-flight network request as an error during reload.
+  await page.route("**/api/concierge/config*", route => route.fulfill({
+    json: { voiceEnabled: false, access: "required" },
+  }));
   await page.addInitScript(() => {
     sessionStorage.setItem("bumpin-demo-identity", "phone-self");
     if (!localStorage.getItem("mobile-seeded")) {
@@ -80,7 +85,7 @@ for (const viewport of [
       page.getByRole("heading", { name: "Ada Lovelace", exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Connect on LinkedIn" }),
+      page.getByRole("link", { name: "Connect on LinkedIn", exact: true }),
     ).toBeInViewport();
     await noOverflow(page);
     await page.getByRole("button", { name: "Close profile" }).click();
@@ -138,7 +143,7 @@ test("long profiles wrap and the sheet body scrolls while actions stay reachable
     page.getByRole("button", { name: "Close profile" }),
   ).toBeInViewport();
   await expect(
-    page.getByRole("link", { name: "Connect on LinkedIn" }),
+    page.getByRole("link", { name: "Connect on LinkedIn", exact: true }),
   ).toBeInViewport();
   expect(
     await page
@@ -162,7 +167,7 @@ test("matching works at keyboard-sized heights and reports an empty result", asy
     localStorage.setItem(key, JSON.stringify(pool));
   });
   await page.reload();
-  await page.getByRole("button", { name: "Find people to meet" }).click();
+  await page.getByRole("button", { name: "Introductions – find people to meet", exact: true }).click();
   await page
     .getByText("Or search for a skill or project", { exact: true })
     .click();

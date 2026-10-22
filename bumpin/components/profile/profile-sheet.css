@@ -1,0 +1,31 @@
+.profile-section > p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.profile-link-section .muted,
+.profile-source-note {
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+.profile-link-section .profile-link-address {
+  font-size: 15px;
+  margin-bottom: 8px;
+  color: var(--foreground);
+}
+.profile-link-editor {
+  margin-top: 16px;
+}
+.profile-link-editor summary {
+  min-height: 44px;
+  align-content: center;
+  cursor: pointer;
+}
+.profile-link-editor .optional-content {
+  display: grid;
+  gap: 12px;
+}
+.profile-source-note {
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}

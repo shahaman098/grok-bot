@@ -18,6 +18,7 @@ import {
   subscribeDemoPool,
   upsertDemoMember,
   updateDemoProfile,
+  updateDemoLinkedIn,
 } from "@/lib/demo/local-pool";
 import type { LinkedInIdentity } from "@/lib/auth/linkedin";
 import { ensureSession } from "@/lib/auth/ensure-session";
@@ -523,6 +524,19 @@ export function EventExperience({ slug, initialEvent }: Props) {
     setMatchProfile(values);
     await refreshAttendees();
   }
+
+  async function saveLinkedInProfile(raw: string) {
+    const linkedinUrl = normalizeLinkedInUrl(raw);
+    if (raw.trim() && !linkedinUrl)
+      throw new Error("Use your LinkedIn profile URL, such as linkedin.com/in/your-name.");
+    if (demoMode) updateDemoLinkedIn(slug, linkedinUrl);
+    else await requestJson("/api/me", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ eventSlug: slug, linkedinUrl: linkedinUrl ?? "" }),
+    });
+    await refreshAttendees();
+  }
   function recordConnection(connection: Connection) {
     setConnections((current) => [
       connection,
@@ -561,9 +575,12 @@ export function EventExperience({ slug, initialEvent }: Props) {
     await refreshAttendees();
   }
 
-  const visibleCount = attendees.filter((a) => !a.isSelf).length;
+  // The server also returns a hidden member's own profile for editing.
+  // Only show it in the public-facing directory while they are visible.
+  const displayedAttendees = attendees.filter((a) => !a.isSelf || visible);
+  const visibleCount = displayedAttendees.length;
   const currentAttendee =
-    attendees.find((a) => a.membershipId === selected?.membershipId) ?? null;
+    displayedAttendees.find((a) => a.membershipId === selected?.membershipId) ?? null;
 
   if (restoring)
     return (
@@ -678,7 +695,7 @@ export function EventExperience({ slug, initialEvent }: Props) {
       >
         {view === "people" ? (
           <AttendeeList
-            attendees={attendees}
+            attendees={displayedAttendees}
             onSelect={selectAttendee}
             onShare={() => void shareEvent()}
           />
@@ -690,16 +707,17 @@ export function EventExperience({ slug, initialEvent }: Props) {
                 lng: event.venueLng,
                 name: event.venueName,
               }}
-              attendees={attendees}
+              attendees={displayedAttendees}
               selectedId={focusedMatchId ?? selected?.membershipId ?? null}
               matchedIds={currentConciergeMatches.map(match=>match.membershipId)}
               className={currentConciergeMatches.length ? conciergeStyles.mapWithMatches : undefined}
               onSelectAttendee={selectAttendee}
               onSelectEvent={() => setEventOpen(true)}
+              onShowPeople={() => setView("people")}
             />
             <MapMatches matches={currentConciergeMatches} attendees={attendees} focusedId={focusedMatchId} onFocus={focusConciergeMatch} onOpen={selectAttendee} onClear={()=>{setConciergeMatches([]);setFocusedMatchId(null);}} />
             <p className="map-disclaimer">
-              Venue-based markers · no GPS collected
+              Attendee markers show the venue, not live positions
             </p>
           </div>
         )}
@@ -748,6 +766,7 @@ export function EventExperience({ slug, initialEvent }: Props) {
         eventName={event.name}
         open={profileOpen && !!currentAttendee}
         onOpenChange={setProfileOpen}
+        onSaveLinkedIn={saveLinkedInProfile}
       />
       <EventInfoSheet
         event={event}

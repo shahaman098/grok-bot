@@ -1,0 +1,166 @@
+Window: "Grok Bot", App: Grok Bot.
+0 standard window Grok Bot, Secondary Actions: Raise
+	1 container Grok Bot
+		2 container
+			3 HTML content Grok Bot, URL: file:///Applications/Grok%20Bot.app/Contents/Resources/app.asar/dist/renderer/index.html
+				4 container
+					5 container Bots
+						6 button Search
+						7 button New Bot
+						8 container Bot list
+							9 container Pinned Bots
+								10 button Sorcerer, Main Bot
+									11 image Main Bot
+									12 text Sorcerer
+							13 content list
+								14 button Jarvis
+									15 text Jarvis
+									16 text All three came back as expected. The real search found only the fictional demo attendee, and the other two found nothing. These were fresh calls to the BumpIn endpoint on the grok-bot-london even…
+						17 pop-up button Kris Sah
+						18 button Connect apps
+						19 container Downloading update…
+						20 splitter Resize sidebar
+					21 container Jarvis
+						22 container Jarvis
+							23 heading Description: Jarvis, Value: 2
+								24 button View conversation details
+									25 text Jarvis
+						26 container Conversation transcript
+							27 container
+								28 container Jarvis 9:13:28 PM
+									29 container BumpIn demo event token
+										30 container BumpIn demo event token
+											31 button Secrets Saved · BumpIn demo event token
+												32 text Secrets
+												33 text Saved
+												34 text  · 
+												35 text BumpIn demo event token
+									36 container 9:13:28 PM
+										37 text 9:13 PM
+								38 container Jarvis 9:14:57 PM
+									39 container Jarvis The demo token is saved securely, but BumpIn rejected it. A test call to find_my_collaborators came back with "BumpIn connection expired or revoked. Reconnect at /connect/grok." It might be the wrong token, one that's already been revoked, or one for a different session. If you get a new one from the BumpIn connect page , paste it into a new secure box and I'll test it. I won't use the older tokens. The token stays private to me and hasn't appeared in chat, and I haven't sent any introductions.
+										40 text Jarvis
+										41 container
+											42 text The demo token is saved securely, but BumpIn rejected it. A test call to 
+											43 text find_my_collaborators
+											44 text  came back with "BumpIn connection expired or revoked. Reconnect at /connect/grok." It might be the wrong token, one that's already been revoked, or one for a different session. If you get a new one from the 
+											45 link Description: BumpIn connect page, Value: bumpin-silk.vercel.app/connect/grok
+											46 text ,  paste it into a new secure box and I'll test it. I won't use the older tokens. The token stays private to me and hasn't appeared in chat, and I haven't sent any introductions.
+									47 container 9:14:57 PM
+										48 text 9:14 PM
+								49 container You 9:16:02 PM
+									50 container You The first demo token was revoked during the test. Please open a new protected secret card named BUMPIN_DEMO_FINAL. I will enter a fresh token; afterward use only that secret. Do not open the BumpIn browser, join, mint, revoke, hide or leave any event yourself. Just use authenticated HTTP MCP requests for matching.
+										51 text You
+										52 text The first demo token was revoked during the test. Please open a new protected secret card named BUMPIN_DEMO_FINAL. I will enter a fresh token; afterward use only that secret. Do not open the BumpIn browser, join, mint, revoke, hide or leave any event yourself. Just use authenticated HTTP MCP requests for matching.
+									53 container 9:16:02 PM
+										54 text 9:16 PM
+								55 container Jarvis 9:16:06 PM
+									56 container Jarvis I'm opening a secure box for the final token. After this I'll only use that one, just for search requests, and I won't open BumpIn in a browser or change anything there.
+										57 text Jarvis
+										58 text I'm opening a secure box for the final token. After this I'll only use that one, just for search requests, and I won't open BumpIn in a browser or change anything there.
+									59 container 9:16:06 PM
+										60 text 9:16 PM
+								61 container Jarvis 9:16:11 PM
+									62 container BumpIn final demo token
+										63 container BumpIn final demo token
+											64 button Secrets Saved · BumpIn final demo token
+												65 text Secrets
+												66 text Saved
+												67 text  · 
+												68 text BumpIn final demo token
+									69 container 9:16:11 PM
+										70 text 9:16 PM
+								71 container Jarvis 9:16:40 PM
+									72 container Jarvis The final token is saved and works, once I strip off the word "Bearer" that got pasted in with it. BumpIn rejected it as stored, then accepted it after I removed that word on my side, and nothing was printed. A test find_my_collaborators call on grok-bot-london returned 0 matches, which fits a guest profile with no offers or needs. From now on I'll only use this token, and only for search requests to the existing BumpIn address. I won't open BumpIn in a browser, join or leave events, create, revoke o
+										73 text Jarvis
+										74 container
+											75 text The final token is saved and works, once I strip off the word "Bearer" that got pasted in with it. BumpIn rejected it as stored, then accepted it after I removed that word on my side, and nothing was printed. A test 
+											76 text find_my_collaborators
+											77 text  call on 
+											78 text grok-bot-london
+											79 text  returned 
+											80 text 0 matches
+											81 text , which fits a guest profile with no offers or needs. From now on I'll only use this token, and only for search requests to the existing BumpIn address. I won't open BumpIn in a browser, join or leave events, create, revoke or hide anything, or send introductions. Tell me what to search for whenever you're ready.
+									82 container 9:16:40 PM
+										83 text 9:16 PM
+								84 container You 9:17:45 PM
+									85 container You Using BUMPIN_DEMO_FINAL, run fresh authenticated MCP searches for AI agents TypeScript design, zzdemo987unrelated, and find_my_collaborators. Report actual results with exact evidence and label the synthetic attendee as fictional. Token expires 22:16 London. Do not publish anything.Using BUMPIN_DEMO_FINAL, run fresh authenticated MCP calls to https://bumpin-silk.vercel.app/api/mcp: find_people for "AI agents TypeScript design", find_people for "zzdemo987unrelated", and find_my_collaborators. Report actu
+										86 text You
+										87 container
+											88 text Using BUMPIN_DEMO_FINAL, run fresh authenticated MCP searches for AI agents TypeScript design, zzdemo987unrelated, and find_my_collaborators. Report actual results with exact evidence and label the synthetic attendee as fictional. Token expires 22:16 London. Do not publish anything.Using BUMPIN_DEMO_FINAL, run fresh authenticated MCP calls to 
+											89 link Description: https://bumpin-silk.vercel.app/api/mcp, Value: bumpin-silk.vercel.app/api/mcp
+											90 text : find_people for "AI agents TypeScript design", find_people for "zzdemo987unrelated", and find_my_collaborators. Report actual results and exact profile evidence. The visible BumpIn Demo — synthetic attendee is fictional test data. My guest profile has no offers or needs. The token expires 22:16 London today. Keep Jarvis personal and do not publish anything.
+									91 container 9:17:45 PM
+										92 text 9:17 PM
+								93 container Jarvis 9:17:49 PM
+									94 container Jarvis I'm running all three searches again now with the final token.
+										95 text Jarvis
+										96 text I'm running all three searches again now with the final token.
+									97 container 9:17:49 PM
+										98 text 9:17 PM
+								99 container Jarvis 9:18:04 PM
+									100 container Jarvis All three came back as expected. The real search found only the fictional demo attendee, and the other two found nothing. These were fresh calls to the BumpIn endpoint on the grok-bot-london event, using only your final token, and every result came from BumpIn's rule-based matching. find_people with "AI agents TypeScript design" found 1 match. It's the fictional demo attendee, which is test data and not a real person: Display name: "BumpIn Demo — synthetic attendee" Membership ID: 31bd888e…31f444 Sco
+										101 text Jarvis
+										102 container
+											103 text All three came back as expected. The real search found only the fictional demo attendee, and the other two found nothing. These were fresh calls to the BumpIn endpoint on the 
+											104 text grok-bot-london
+											105 text  event, using only your final token, and every result came from BumpIn's rule-based matching.
+											106 container
+												107 text find_people  with "AI agents TypeScript design" found 1 match.
+											108 text  It's the 
+											109 text fictional demo attendee, which is test data and not a real person
+											110 text :
+											111 content list
+												112 container
+													113 AXListMarker • 
+													114 text Display name: "BumpIn Demo — synthetic attendee"
+												115 container
+													116 AXListMarker • 
+													117 text Membership ID:  31bd888e…31f444
+												118 container
+													119 AXListMarker • 
+													120 text Score 4, with the matched terms  agent ,  ai ,  design  and  typescript
+												121 container
+													122 AXListMarker • 
+													123 text Your search text: "AI agents TypeScript design"
+												124 container
+													125 AXListMarker • 
+													126 text Exact text it matched on their profile: "SYNTHETIC DEMO FIXTURE: AI agents built with TypeScript · TypeScript development and interface design · AI agent testing"
+												127 container
+													128 AXListMarker • 
+													129 text BumpIn's suggested opener: "Our profiles connect around agent, ai, design, typescript. What is one specific problem we could explore together?"
+											130 container
+												131 text find_people  with "zzdemo987unrelated" found 0 matches.
+											132 container
+												133 text find_my_collaborators  found 0 matches
+											134 text , which fits your guest profile having no offers or needs. The token expires at 22:16 BST. I haven't published or shared anything, sent introductions, or changed anything on BumpIn.
+									135 container 9:18:04 PM
+										136 text 9:18 PM
+								137 container You 9:19:09 PM
+									138 container
+										139 button Voice chat · 17:49
+											140 text Voice chat
+											141 text  · 17:49
+										142 container Voice chat feedback
+											143 button Good
+											144 button Bad
+									145 container 9:19:09 PM
+										146 text 9:19 PM
+						147 container
+							148 text entry area (settable) Description: Prompt, Placeholder: Message Jarvis, Value: 
+
+							149 pop-up button Composer actions
+							150 button Start voice input
+							151 button Start voice chat
+	152 close button
+	153 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	154 minimise button
+155 menu bar
+	156 Grok Bot
+	157 File
+	158 Edit
+	159 View
+	160 Window
+	161 Help
+
+The focused UI element is 3 HTML content Grok Bot, URL: file:///Applications/Grok%20Bot.app/Contents/Resources/app.asar/dist/renderer/index.html

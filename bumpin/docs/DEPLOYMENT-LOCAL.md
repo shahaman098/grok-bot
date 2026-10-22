@@ -16,7 +16,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open `http://localhost:3000/e/grok-bot-london` (no GPS permission is requested).
+Open `http://localhost:3000/e/grok-bot-london` (location permission is only requested if someone taps **Map → Locate me**).
 
 ## Vercel CLI (HTTPS for phones)
 

@@ -14,7 +14,10 @@ vi.mock("./server", async (importOriginal) => ({
   claimQuota: mocks.quota,
   publicAttendees: mocks.attendees,
 }));
-vi.mock("./matching", () => ({ semanticMatches: mocks.semantic }));
+vi.mock("./matching", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("./matching")>()),
+  semanticMatches: mocks.semantic,
+}));
 import { POST as session } from "@/app/api/concierge/session/route";
 import { POST as search } from "@/app/api/concierge/search/route";
 import { ConciergeError } from "./server";
@@ -123,6 +126,27 @@ describe("concierge routes", () => {
       request({ eventSlug: "test", query: "speech" }),
     );
     expect(await response.json()).toEqual({ matches: [], source: "grok" });
+  });
+  it("uses the authenticated shared profile and excludes it from candidates", async () => {
+    const self = { ...person, membershipId: "self", isSelf: true, lookingFor: "Speech tools" };
+    mocks.attendees.mockResolvedValue([self, person]);
+    const response = await search(request({ eventSlug: "test", query: "Who should I meet?" }));
+    expect(response.status).toBe(200);
+    expect(mocks.semantic).toHaveBeenCalledWith([person], "Who should I meet?", self);
+  });
+  it("falls back safely if the caller's profile changes during matching", async () => {
+    const self = { ...person, membershipId: "self", isSelf: true, lookingFor: "Speech tools" };
+    mocks.attendees.mockResolvedValueOnce([self, person])
+      .mockResolvedValueOnce([{ ...self, lookingFor: "Different goal" }, person]);
+    const response = await search(request({ eventSlug: "test", query: "Speech" }));
+    expect(await response.json()).toMatchObject({ source: "rules", fallbackReason: expect.stringContaining("profile changed") });
+  });
+  it("never exposes self as a result when revalidating the full directory", async () => {
+    const self = { ...person, membershipId: "self", isSelf: true };
+    mocks.attendees.mockResolvedValue([self, person]);
+    mocks.semantic.mockResolvedValue([{ ...match, membershipId: "self" }]);
+    expect(await (await search(request({ eventSlug: "test", query: "Speech" }))).json())
+      .toEqual({ source: "grok", matches: [] });
   });
   it("preserves no-match output and labels provider failure fallbacks", async () => {
     mocks.semantic.mockResolvedValueOnce([]);

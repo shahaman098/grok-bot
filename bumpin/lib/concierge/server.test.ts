@@ -88,6 +88,9 @@ describe("concierge event authorization", () => {
       error: null,
     });
     expect(await publicAttendees(context)).toHaveLength(1);
+    const directory = await publicAttendees(context, { includeSelf: true });
+    expect(directory).toHaveLength(2);
+    expect(directory.find((a) => a.isSelf)?.building).toBe("Audio");
     expect(f.client.rpc).toHaveBeenCalledWith("list_event_attendees", {
       p_event_slug: "event",
     });

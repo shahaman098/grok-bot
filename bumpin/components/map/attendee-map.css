@@ -1,0 +1,5 @@
+.event-person-marker { position: relative; }
+.event-person-self { border-color: var(--accent); box-shadow: 0 0 0 3px #f2b8c233; }
+.event-person-name { position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%); max-width: 130px; width: max-content; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-radius: 6px; padding: 3px 7px; background: #210e16ee; border: 1px solid var(--line); color: white; font-size: 11px; font-weight: 600; }
+.event-person-self .event-person-name { color: var(--accent); }
+.map-people-button { position: absolute; top: 12px; left: 12px; z-index: 3; width: max-content; max-width: calc(100% - 24px); min-height: 44px; background: #210e16ee; font-size: 12px; }

@@ -40,7 +40,7 @@ Timings are targets. If you're behind, drop the optional personal joke (step 6),
 ### 0:00 – 0:20 · The problem
 - **Screen:** laptop on `/qr` (“Find your people.” + QR).
 - **Say:** “Developers need designers. Designers need developers. They spend the whole evening asking where the pizza is. This is Love at First Bot, built on BumpIn, for Track 2, Know Your Members.”
-- **Say, one line on honesty:** “Profiles are self-declared and opt-in. No GPS, no scraping.”
+- **Say, one line on honesty:** “Profiles are self-declared and opt-in. Nobody's location is collected or shared, and there's no scraping.”
 
 ### 0:20 – 0:50 · Two people join, no forms
 1. **Phone A:** scan the QR, or open the event URL. Screen: *“Your people. One hello away.”*
@@ -48,7 +48,7 @@ Timings are targets. If you're behind, drop the optional personal joke (step 6),
 3. **Phone B:** same, **Continue as guest**.
 4. **Phone A shows:** “YOU'RE IN THE ROOM”, the event name, **Visible** pill, People list. The header should read **1 on map** within a few seconds (each phone counts the other).
 5. **Tap the Map tab on Phone A.** The venue marker plus both avatars appear around the venue.
-- **Say:** “Joining puts you on the map automatically. Hide or leave any time. No GPS: markers are arranged around the venue.”
+- **Say:** “Joining puts you on the map automatically. Hide or leave any time. Markers are arranged around the venue, not at anyone's real position. **Locate me** is optional, and your dot is private to you.”
 - **If a phone doesn't appear:** pull to refresh by reloading the page; membership persists.
 
 ### 0:50 – 1:25 · Evidence, then an invitation

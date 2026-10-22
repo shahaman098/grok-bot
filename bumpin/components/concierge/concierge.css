@@ -2,10 +2,10 @@
   position: relative;
   overflow: hidden;
   padding: 24px 18px 18px;
-  border: 1px solid #ffb09a35;
+  border: 1px solid #f7a2b335;
   border-radius: 24px;
   background:
-    radial-gradient(ellipse at 50% 30%, #f58d7130, transparent 65%), #162027;
+    radial-gradient(ellipse at 50% 30%, #eb7b9130, transparent 65%), #26171b;
   text-align: center;
 }
 .bumpin-concierge-dock.bumpin-concierge-dock {
@@ -62,22 +62,22 @@
   font-size: 11px;
   font-weight: 800;
   line-height: 1;
-  border: 2px solid #10191c;
+  border: 2px solid #1b1113;
   box-sizing: content-box;
 }
 .bumpin-concierge-dock.bumpin-concierge-dock > .dock-concierge {
-  background: #ffb49b;
-  color: #17232b;
+  background: #f7a3b4;
+  color: #2a181c;
 }
 .bumpin-concierge-dock.bumpin-concierge-dock > .dock-intros {
   background: #ffffff07;
-  color: #b3c3cc;
+  color: #cbb4ba;
 }
 .bumpin-concierge-marker {
   position: relative;
-  border-color: #ffb49b !important;
+  border-color: #f7a3b4 !important;
   box-shadow:
-    0 0 0 5px #ffb49b35,
+    0 0 0 5px #f7a3b435,
     0 5px 18px #0009;
 }
 .bumpin-concierge-markerRank {
@@ -89,14 +89,14 @@
   width: 21px;
   height: 21px;
   border-radius: 50%;
-  border: 2px solid #17232b;
-  background: #ffb49b;
-  color: #17232b;
+  border: 2px solid #2a181c;
+  background: #f7a3b4;
+  color: #2a181c;
   font-size: 11px;
   font-weight: 800;
 }
 .bumpin-concierge-eyebrow {
-  color: #ffb29d;
+  color: #f8a4b5;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.15em;
@@ -108,32 +108,32 @@
   width: 106px;
   height: 106px;
   margin: 24px auto 22px;
-  color: #ffb49b;
-  border: 1px solid #ffb49b65;
+  color: #f7a3b4;
+  border: 1px solid #f7a3b465;
   border-radius: 50%;
   background: radial-gradient(
     circle at 38% 32%,
-    #ffc9a03b,
+    #f8a7b73b,
     #e3726026 50%,
-    #131e26 75%
+    #251418 75%
   );
   box-shadow:
-    0 0 45px #ef8a6d20,
-    inset 0 0 30px #ffb49b20;
+    0 0 45px #e5778d20,
+    inset 0 0 30px #f7a3b420;
 }
 .bumpin-concierge-orb span {
   position: absolute;
   inset: -9px;
-  border: 1px solid #ffb49b25;
+  border: 1px solid #f7a3b425;
   border-radius: 50%;
 }
 .bumpin-concierge-orb span:nth-of-type(2) {
   inset: -18px;
-  border-color: #ffb49b15;
+  border-color: #f7a3b415;
 }
 .bumpin-concierge-orb span:nth-of-type(3) {
   inset: -27px;
-  border-color: #ffb49b0a;
+  border-color: #f7a3b40a;
 }
 .bumpin-concierge-live {
   animation: breathe 2.3s ease-in-out infinite;
@@ -147,19 +147,19 @@
 }
 .bumpin-concierge-hero h2 em {
   font-style: normal;
-  color: #ffb49b;
+  color: #f7a3b4;
 }
 .bumpin-concierge-status {
   min-height: 24px;
-  color: #b8c7cb;
+  color: #cab9bd;
   font-size: 13px;
   margin: 16px 0;
 }
 .bumpin-concierge-start {
   width: 100%;
   justify-content: center;
-  background: #ffb49b;
-  color: #182027;
+  background: #f7a3b4;
+  color: #26191c;
 }
 .bumpin-concierge-controls {
   display: flex;
@@ -176,7 +176,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #ffc2b5;
+  color: #f8aaba;
   background: #602f35;
   border: 1px solid #b65a62;
   border-radius: 13px;
@@ -185,11 +185,11 @@
   margin: 13px auto 0;
   max-width: 330px;
   font-size: 11px;
-  color: #9fadb4;
+  color: #b3a0a5;
   line-height: 1.5;
 }
 .bumpin-concierge-hint {
-  color: #aab8be;
+  color: #bdabaf;
   font-size: 12px;
   line-height: 1.5;
   margin: 12px 0;
@@ -210,14 +210,14 @@
   padding: 10px 13px;
   border-radius: 12px;
   background: #ffffff08;
-  color: #c8d0d5;
+  color: #d4c9cc;
   font-size: 13px;
   overflow-wrap: anywhere;
 }
 .bumpin-concierge-captions strong {
   display: block;
   margin-bottom: 3px;
-  color: #ffb49b;
+  color: #f7a3b4;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -235,7 +235,7 @@
   gap: 7px;
 }
 .bumpin-concierge-examples > span {
-  color: #a4afb9;
+  color: #b8a5aa;
   font-size: 11px;
   letter-spacing: 0.12em;
 }
@@ -249,7 +249,7 @@
   padding: 10px 12px;
   border: 1px solid #ffffff15;
   border-radius: 12px;
-  color: #c9d3d9;
+  color: #d8cacd;
   background: #ffffff04;
   font-size: 13px;
 }
@@ -263,7 +263,7 @@
   display: flex;
   gap: 12px;
   align-items: flex-start;
-  background: #18242b;
+  background: #2a191d;
   border: 1px solid #ffffff12;
   border-radius: 16px;
   padding: 14px;
@@ -274,14 +274,14 @@
 }
 .bumpin-concierge-results p {
   font-size: 13px;
-  color: #b0bec6;
+  color: #c5b1b6;
   margin: 5px 0 0;
   overflow-wrap: anywhere;
 }
 .bumpin-concierge-number {
   font-size: 11px;
   letter-spacing: 0.08em;
-  color: #ffb49b;
+  color: #f7a3b4;
   padding-top: 4px;
 }
 .bumpin-concierge-callbar {
@@ -295,8 +295,8 @@
   gap: 5px;
   width: calc(100% - 24px);
   max-width: 500px;
-  border: 1px solid #ffb49b65;
-  background: #18232cf5;
+  border: 1px solid #f7a3b465;
+  background: #2b191df5;
   border-radius: 18px;
   padding: 7px;
   box-shadow: 0 8px 28px #0008;
@@ -310,7 +310,7 @@
   text-align: left;
   background: none;
   border: 0;
-  color: #edf4f6;
+  color: #f6edef;
   padding: 5px 8px;
   min-height: 44px;
 }
@@ -330,19 +330,19 @@
 .bumpin-concierge-resume small {
   font-size: 11px;
   font-weight: 400;
-  color: #b7c6cf;
+  color: #ceb8be;
   margin-top: 2px;
 }
 .bumpin-concierge-pulse {
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: #ffb49b;
-  box-shadow: 0 0 0 5px #ffb49b18;
+  background: #f7a3b4;
+  box-shadow: 0 0 0 5px #f7a3b418;
   flex-shrink: 0;
 }
 .bumpin-concierge-hangup {
-  color: #ffb5ac;
+  color: #f8aaba;
   background: #5a2b36;
 }
 .bumpin-concierge-mapMatches {
@@ -357,9 +357,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #ffb49b;
+  color: #f7a3b4;
   padding: 0 3px 3px 10px;
-  background: #111c23ed;
+  background: #221216ed;
   border-radius: 14px 14px 0 0;
   pointer-events: auto;
 }
@@ -386,14 +386,14 @@
   max-width: 350px;
   flex: 1 0 265px;
   scroll-snap-align: start;
-  border: 1px solid #46555e;
+  border: 1px solid #5d474d;
   border-radius: 15px;
   padding: 12px;
-  background: #14212af5;
+  background: #29151af5;
   box-shadow: 0 7px 24px #0005;
 }
 .bumpin-concierge-focused {
-  border-color: #ffb49b;
+  border-color: #f7a3b4;
 }
 .bumpin-concierge-matchFocus {
   display: flex;
@@ -405,7 +405,7 @@
   border: 0;
   background: none;
   padding: 0;
-  color: #f2f5ef;
+  color: #f6eef0;
 }
 .bumpin-concierge-matchFocus strong,
 .bumpin-concierge-matchFocus small {
@@ -413,7 +413,7 @@
 }
 .bumpin-concierge-matchFocus small {
   font-size: 11px;
-  color: #a6b5be;
+  color: #bda7ad;
   margin-top: 2px;
 }
 .bumpin-concierge-matchAvatar {
@@ -428,14 +428,14 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #ffb49b;
-  color: #19212b;
+  background: #f7a3b4;
+  color: #2a1a1e;
   font-size: 11px;
   font-weight: 800;
 }
 .bumpin-concierge-mapCard > p {
   margin: 8px 0 5px;
-  color: #c1cbd1;
+  color: #d0c2c5;
   font-size: 12px;
   line-height: 1.45;
   max-height: 54px;
@@ -450,14 +450,14 @@
   font-size: 12px;
   font-weight: 650;
   border: 0;
-  color: #ffb49b;
+  color: #f7a3b4;
   background: none;
 }
 @keyframes breathe {
   50% {
     box-shadow:
-      0 0 60px #ef8a6d48,
-      inset 0 0 35px #ffb49b30;
+      0 0 60px #e5778d48,
+      inset 0 0 35px #f7a3b430;
     transform: scale(1.035);
   }
 }

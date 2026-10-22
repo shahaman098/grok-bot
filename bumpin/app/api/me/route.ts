@@ -1,10 +1,13 @@
 import { linkedInIdentity } from "@/lib/auth/linkedin";
 import { NextResponse } from "next/server";
 import { resolveDisplayPosition } from "@/lib/display-position";
-import { patchMeSchema } from "@/lib/validation";
+import { normalizeLinkedInUrl, patchMeSchema } from "@/lib/validation";
+import { mutationGuard } from "@/lib/connections/api";
 import { createClient } from "@/lib/supabase/server";
 
 export async function PATCH(request: Request) {
+  const blocked = mutationGuard(request);
+  if (blocked) return blocked;
   try {
     const body = patchMeSchema.parse(await request.json());
     const supabase = await createClient();
@@ -42,6 +45,8 @@ export async function PATCH(request: Request) {
     const locationConsent = body.locationConsent ?? existing.location_consent;
 
     const profilePatch: Record<string, string | null> = {};
+    if (body.linkedinUrl !== undefined)
+      profilePatch.linkedin_url = normalizeLinkedInUrl(body.linkedinUrl);
     if (body.canHelpWith !== undefined)
       profilePatch.can_help_with = body.canHelpWith.trim() || null;
     if (body.building !== undefined) {

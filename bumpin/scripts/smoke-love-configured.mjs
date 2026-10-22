@@ -216,13 +216,30 @@ try {
     });
     assert.equal(semantic.source, "grok", "Expected a real semantic provider result, not a fallback");
     assert.equal(semantic.matches[0].displayName, "QA Fictional Bob");
-    assert.ok(semantic.matches[0].evidence.every((e) => "Product design".includes(e.theirExcerpt)));
+    const safeFields = { canHelpWith: "Product design", building: "AI event tools", lookingFor: "React developers" };
+    const verifiedBob = (result) => {
+      assert.equal(result.source, "grok", "Expected real semantic matching, not fallback");
+      assert.equal(result.matches[0].displayName, "QA Fictional Bob");
+      assert.ok(result.matches[0].evidence.length >= 1);
+      for (const evidence of result.matches[0].evidence)
+        assert.ok(safeFields[evidence.profileField]?.includes(evidence.theirExcerpt), "Evidence must quote the exact candidate field");
+    };
+    verifiedBob(semantic);
+    const combined = await api("/api/concierge/search", alice, "POST", {
+      eventSlug: slug, query: "Who offers product design help and is building AI event tools?",
+    });
+    verifiedBob(combined);
+    assert.deepEqual(combined.matches[0].evidence.map((e) => e.profileField), ["canHelpWith", "building"]);
+    const personalized = await api("/api/concierge/search", alice, "POST", {
+      eventSlug: slug, query: "Who should I meet?",
+    });
+    verifiedBob(personalized);
     const voice = await api("/api/concierge/session", alice, "POST", { eventSlug: slug });
     assert.equal(typeof voice.token, "string");
     assert.ok(voice.token.length > 10);
     assert.equal(voice.model, "grok-voice-3.0");
     assert.ok(voice.expiresAt > Date.now() / 1000);
-    pass("approved attendee receives real xAI semantic evidence and a short-lived voice credential; secrets withheld");
+    pass("approved attendee receives real xAI personalized/multi-field evidence and a short-lived voice credential; secrets withheld");
   }
   await db.query("update public.concierge_access set status='revoked' where event_id=$1 and user_id=$2", [eventId, ids[0]]);
   assert.equal((await api("/api/concierge/access", alice, "POST", { eventSlug: slug })).access, "revoked");

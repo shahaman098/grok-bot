@@ -335,8 +335,8 @@ export function ConciergePanel(props: Props) {
             </p>
           )}
           <p className={styles.disclosure}>
-            Voice uses xAI to process audio and shared profile details. BumpIn
-            doesn’t save recordings or transcripts.
+            Voice and AI matching use xAI to process audio and shared offers,
+            projects and goals. BumpIn doesn’t save recordings or transcripts.
           </p>
         </section>
         {error && (
@@ -388,7 +388,7 @@ export function ConciergePanel(props: Props) {
         </form>
         <div className={styles.examples}>
           <span>TRY ASKING</span>
-          {["Who can help with React?", "Who’s building AI agents?"].map(
+          {["Who should I meet?", "Who can help with React?", "Who’s building AI agents?"].map(
             (q) => (
               <button
                 type="button"

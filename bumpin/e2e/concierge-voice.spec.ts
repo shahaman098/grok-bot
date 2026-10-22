@@ -51,16 +51,21 @@ const attendees = [
 const matches = attendees.slice(1).map((a, i) => ({
   membershipId: a.membershipId,
   displayName: a.displayName,
-  reason: `Relevant offer of help: “${a.canHelpWith}”.`,
+  reason: `Relevant offer of help: “${a.canHelpWith}”. Related project: “${a.building}”.`,
   score: 90 - i,
   source: "grok",
   category: "search",
   evidence: [
     {
       direction: "search",
+      profileField: "canHelpWith",
       terms: [],
       yourExcerpt: "speech models",
       theirExcerpt: a.canHelpWith,
+    },
+    {
+      direction: "search", profileField: "building", terms: [],
+      yourExcerpt: "speech models", theirExcerpt: a.building,
     },
   ],
   conversationStarter: "Tell me about your project",
@@ -333,8 +338,16 @@ test("simulated live conversation produces map matches, supports a follow-up and
   await expect(
     page.getByRole("region", { name: "Active voice concierge" }),
   ).toBeVisible();
+  const cards = page.getByRole("region", { name: "Concierge matches" });
+  await expect(cards).toContainText("Speech recognition");
+  await expect(cards).toContainText("Audio agents");
   await expect
-    .poll(() => outputs.some((value) => value.includes("Speech recognition")))
+    .poll(() => outputs.some((value) => {
+      const result = JSON.parse(value);
+      const ada = result.matches?.find((match: { membershipId: string }) => match.membershipId === "ada");
+      return ada?.evidence.includes("Speech recognition") &&
+        ada.evidence.includes("Audio agents");
+    }))
     .toBe(true);
   emit({ type: "input_audio_buffer.speech_started" });
   emit({ type: "response.created" });
@@ -371,6 +384,11 @@ test("simulated live conversation produces map matches, supports a follow-up and
     page.getByRole("region", { name: "Active voice concierge" }),
   ).toHaveCount(0);
   expect(await page.evaluate(() => window.conciergeQA.stopped)).toBe(1);
+  await page.getByRole("button", { name: "Open matched profile for Ada" }).click();
+  await expect(page.getByRole("heading", { name: "Ada", exact: true })).toBeVisible();
+  await expect(page.getByText("Audio agents", { exact: true })).toBeVisible();
+  await expect(page.getByText("Speech recognition", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Close profile" }).click();
   expect(errors).toEqual([]);
 });
 

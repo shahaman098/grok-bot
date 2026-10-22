@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-const linkedInHost = /^https:\/\/(www\.)?linkedin\.com\//i;
-
 export function normalizeLinkedInUrl(
   raw: string | undefined | null,
 ): string | null {
@@ -13,8 +11,10 @@ export function normalizeLinkedInUrl(
   try {
     const parsed = new URL(url);
     if (parsed.protocol !== "https:") return null;
-    if (!linkedInHost.test(parsed.href)) return null;
-    return parsed.href.split("?")[0];
+    if (!["linkedin.com", "www.linkedin.com"].includes(parsed.hostname)) return null;
+    if (parsed.username || parsed.password || parsed.port) return null;
+    if (!/^\/in\/[^/\s]+\/?$/.test(parsed.pathname)) return null;
+    return `https://www.linkedin.com${parsed.pathname}`;
   } catch {
     return null;
   }
@@ -36,6 +36,10 @@ export const joinBodySchema = z.object({
 
 export const patchMeSchema = z.object({
   eventSlug: z.string().trim().min(1).max(64),
+  linkedinUrl: z.string().trim().max(2048).refine(
+    (value) => value === "" || normalizeLinkedInUrl(value) !== null,
+    "Use your LinkedIn profile URL, such as linkedin.com/in/your-name.",
+  ).optional(),
   visible: z.boolean().optional(),
   building: z.string().max(200).optional(),
   lookingFor: z.string().max(200).optional(),

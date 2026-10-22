@@ -2,6 +2,8 @@
 
 import { Avatar } from "@/components/ui/avatar";
 import { AttendeeList } from "@/components/event/attendee-list";
+import { PrivateLocation } from "./private-location";
+import "./attendee-map.css";
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import { getVersion, setWorkerUrl } from "maplibre-gl";
@@ -14,7 +16,7 @@ import Map, {
 import { getMapStyle } from "@/lib/map/style";
 import type { PublicAttendee } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { MapPin } from "lucide-react";
+import { MapPin, UsersRound } from "lucide-react";
 import conciergeStyles from "@/components/concierge/styles";
 
 setWorkerUrl(`/maplibre/maplibre-gl-worker.mjs?v=${getVersion()}`);
@@ -32,6 +34,7 @@ type Props = {
   matchedIds?: string[];
   onSelectAttendee: (attendee: PublicAttendee) => void;
   onSelectEvent: () => void;
+  onShowPeople: () => void;
   className?: string;
 };
 
@@ -42,6 +45,7 @@ export function AttendeeMap({
   matchedIds = [],
   onSelectAttendee,
   onSelectEvent,
+  onShowPeople,
   className,
 }: Props) {
   const [mapFailed, setMapFailed] = useState(false);
@@ -79,9 +83,32 @@ export function AttendeeMap({
   const visibleAttendees = attendees.filter(
     (a) =>
       Number.isFinite(a.displayLat) &&
-      Number.isFinite(a.displayLng) &&
-      !a.isSelf,
+      Number.isFinite(a.displayLng),
   );
+
+  function showAttendees() {
+    const map = mapRef.current;
+    if (!map) return;
+    const { clientHeight: height, clientWidth: width } = map.getContainer();
+    const latitudes = [venue.lat, ...visibleAttendees.map(a => a.displayLat)];
+    const longitudes = [venue.lng, ...visibleAttendees.map(a => a.displayLng)];
+    map.fitBounds([
+      [Math.min(...longitudes), Math.min(...latitudes)],
+      [Math.max(...longitudes), Math.max(...latitudes)],
+    ], {
+      maxZoom: 17,
+      // Locate me leaves camera padding behind. Replace it when fitting the
+      // attendees; adding both paddings can leave no viewport on small phones.
+      absolutePadding: true,
+      padding: {
+        top: Math.min(80, height * 0.25),
+        bottom: Math.min(240, height * 0.4),
+        left: Math.min(65, width * 0.2),
+        right: Math.min(65, width * 0.2),
+      },
+      duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 600,
+    });
+  }
 
   if (mapFailed)
     return (
@@ -108,7 +135,7 @@ export function AttendeeMap({
           Retry map
         </button>
         <AttendeeList
-          attendees={visibleAttendees}
+          attendees={attendees}
           onSelect={onSelectAttendee}
         />
       </div>
@@ -129,6 +156,7 @@ export function AttendeeMap({
         mapStyle={styleUrl}
         attributionControl={{ compact: false }}
       >
+        <PrivateLocation mapRef={mapRef} ready={mapLoaded} venueLat={venue.lat} venueLng={venue.lng} onShowAttendees={showAttendees} />
         <NavigationControl
           position="bottom-right"
           style={{ marginBottom: 42 }}
@@ -142,7 +170,7 @@ export function AttendeeMap({
             className="flex flex-col items-center gap-0.5"
             aria-label="Event venue"
           >
-            <span className="rounded-full bg-lime-300 p-3 text-slate-950 shadow-lg">
+            <span className="rounded-full bg-[#5a141e] p-3 text-white ring-1 ring-[#8e2a3c] shadow-lg">
               <MapPin className="h-5 w-5" />
             </span>
             <span className="max-w-[120px] truncate rounded-md bg-slate-950/80 px-2 py-0.5 text-[10px] font-medium text-sky-100">
@@ -163,8 +191,10 @@ export function AttendeeMap({
               onClick={() => onSelectAttendee(a)}
               className={cn(
                 "rounded-full border-2 p-0.5 transition-transform",
+                "event-person-marker",
+                a.isSelf && "event-person-self",
                 selectedId === a.membershipId
-                  ? "border-lime-300 scale-110"
+                  ? "border-rose-300 scale-110"
                   : "border-white/80",
                 matchedIds.includes(a.membershipId) && conciergeStyles.marker,
               )}
@@ -175,6 +205,7 @@ export function AttendeeMap({
               aria-label={`Open profile for ${a.displayName}`}
             >
               <Avatar seed={a.avatarSeed} photo={a.avatarUrl} size={44} />
+              <span className="event-person-name">{a.displayName}{a.isSelf && " · You"}</span>
               {matchedIds.includes(a.membershipId) && (
                 <span className={conciergeStyles.markerRank}>
                   {matchedIds.indexOf(a.membershipId) + 1}
@@ -184,6 +215,11 @@ export function AttendeeMap({
           </Marker>
         ))}
       </Map>
+      {!matchedIds.length && (
+        <button type="button" className="map-people-button secondary-button" onClick={onShowPeople}>
+          <UsersRound size={18} /> View profiles · {attendees.length}
+        </button>
+      )}
       {!mapLoaded && (
         <p role="status" className="map-status">
           Loading the event map…

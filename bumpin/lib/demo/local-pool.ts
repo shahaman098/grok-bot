@@ -133,6 +133,14 @@ export function upsertDemoMember(
   ]);
 }
 
+export function updateDemoLinkedIn(slug: string, linkedinUrl: string | null) {
+  const member = getDemoMember(slug);
+  if (!member) throw new Error("Join this event first.");
+  savePool(slug, loadPool(slug).map((m) =>
+    m.membershipId === member.membershipId ? { ...m, linkedinUrl } : m,
+  ));
+}
+
 export function updateDemoProfile(
   slug: string,
   input: { building: string; canHelpWith: string; lookingFor: string },
