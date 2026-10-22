@@ -1,5 +1,7 @@
 # Three-minute demo — Love at First Bot, by BumpIn
 
+For the exact taps, screens and fallbacks, follow [DEMO-WALKTHROUGH.md](DEMO-WALKTHROUGH.md).
+
 Use two consenting people and a laptop. Rehearse the complete flow before presenting. Fictional demo profiles must be labelled as fictional; don't describe browser preview tabs as separate phones.
 
 ## 0:00–0:20 — The problem and the joke
