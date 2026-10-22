@@ -1,0 +1,7 @@
+# Privacy, abuse prevention and safety
+Location sharing is opt-in, revocable, event-scoped, and foreground-only. Browser HTTPS is necessary but not sufficient for location: user permission, device settings, permissions policy, and browser restrictions still apply. Prefer top-level Vercel page over embedded Notion iframe.
+
+Default: no GPS required. Display event-anchored approximate markers rather than exact coordinates; label 'At this event' not 'exact location'. Don't store raw GPS in MVP. Restrict attendee directory to joined members where possible. Add delete profile and leave event. Expire event membership after event, set short retention for POC, disclose collection and storage. Validate and normalise LinkedIn URLs to `https://www.linkedin.com/...`, reject javascript/data schemes. Rate limit registration and recommendations; guard prompt injection in profile text; never send private user data to third-party AI without consent. Sanitize content; never embed service-role keys client-side. Require authentication or secure anonymous identity for mutations. No hidden tracking.
+
+
+Current implementation: no browser geolocation is requested. The server always computes venue-based offsets. Apply `20261022180000_venue_only_positions.sql` to scrub old positions and enforce this rule for direct authenticated database writes as well. The migration has not been applied to production by the local review.

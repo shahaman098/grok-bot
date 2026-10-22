@@ -1,0 +1,2 @@
+# Implementation worker prompt
+Read AGENTS.md and assigned scope. Produce a small working change with tests. Start by listing acceptance criteria and files to modify. Keep React client-only map code SSR-safe. Follow security and RLS constraints. Never touch files owned by another active worker without coordination. Run typecheck/lint/tests; report exact commands and results, risks and next steps. Do not fabricate external integrations.
