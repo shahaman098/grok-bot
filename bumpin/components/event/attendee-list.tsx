@@ -5,6 +5,7 @@ import type { PublicAttendee } from "@/lib/types";
 import { normalizeLinkedInUrl } from "@/lib/validation";
 import { ArrowUpRight, Share2, UsersRound } from "lucide-react";
 import "./attendee-list.css";
+import { readProfessionalProfile } from "@/lib/professional-profile";
 
 type Props = {
   attendees: PublicAttendee[];
@@ -54,6 +55,7 @@ export function AttendeeList({ attendees, onSelect, onShare }: Props) {
         <ul className="people-grid">
           {people.map((person) => {
             const linkedinUrl = normalizeLinkedInUrl(person.linkedinUrl);
+            const professional = readProfessionalProfile(person.professionalProfile);
             return (
               <li key={person.membershipId} className="person-entry">
                 <button
@@ -69,10 +71,12 @@ export function AttendeeList({ attendees, onSelect, onShare }: Props) {
                   />
                   <span className="person-copy">
                     <span className="person-name">{person.displayName}{person.isSelf && " · You"}</span>
+                    {professional?.headline && <span className="person-detail">{professional.headline}</span>}
+                    {professional?.skills && <span className="person-detail">Skills: {professional.skills}</span>}
                     {person.building && <span className="person-detail">Building: {person.building}</span>}
                     {person.canHelpWith && <span className="person-detail">Can help: {person.canHelpWith}</span>}
                     {person.lookingFor && <span className="person-detail">Looking for: {person.lookingFor}</span>}
-                    {!person.building && !person.canHelpWith && !person.lookingFor && (
+                    {!professional && !person.building && !person.canHelpWith && !person.lookingFor && (
                       <span className="person-detail">{person.isSelf ? "Add your project, offers and needs in Introductions." : "No profile details shared yet. Tap to say hello."}</span>
                     )}
                     <span className="person-tag">

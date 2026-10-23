@@ -19,6 +19,7 @@ import {
   upsertDemoMember,
   updateDemoProfile,
   updateDemoLinkedIn,
+  updateDemoProfessionalProfile,
 } from "@/lib/demo/local-pool";
 import type { LinkedInIdentity } from "@/lib/auth/linkedin";
 import { ensureSession } from "@/lib/auth/ensure-session";
@@ -37,6 +38,7 @@ import type {
   RecommendResult,
 } from "@/lib/types";
 import { normalizeLinkedInUrl } from "@/lib/validation";
+import type { ProfessionalProfile } from "@/lib/professional-profile";
 import {
   Eye,
   EyeOff,
@@ -537,6 +539,14 @@ export function EventExperience({ slug, initialEvent }: Props) {
     });
     await refreshAttendees();
   }
+  async function saveProfessionalProfile(professionalProfile: ProfessionalProfile | null) {
+    if (demoMode) updateDemoProfessionalProfile(slug, professionalProfile);
+    else await requestJson("/api/me", {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ eventSlug: slug, professionalProfile }),
+    });
+    await refreshAttendees();
+  }
   function recordConnection(connection: Connection) {
     setConnections((current) => [
       connection,
@@ -767,6 +777,7 @@ export function EventExperience({ slug, initialEvent }: Props) {
         open={profileOpen && !!currentAttendee}
         onOpenChange={setProfileOpen}
         onSaveLinkedIn={saveLinkedInProfile}
+        onSaveProfessionalProfile={saveProfessionalProfile}
       />
       <EventInfoSheet
         event={event}

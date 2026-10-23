@@ -4,6 +4,7 @@ import { resolveDisplayPosition } from "@/lib/display-position";
 import { normalizeLinkedInUrl, patchMeSchema } from "@/lib/validation";
 import { mutationGuard } from "@/lib/connections/api";
 import { createClient } from "@/lib/supabase/server";
+import { readProfessionalProfile } from "@/lib/professional-profile";
 
 export async function PATCH(request: Request) {
   const blocked = mutationGuard(request);
@@ -44,7 +45,9 @@ export async function PATCH(request: Request) {
     const visible = body.visible ?? existing.visible;
     const locationConsent = body.locationConsent ?? existing.location_consent;
 
-    const profilePatch: Record<string, string | null> = {};
+    const profilePatch: Record<string, unknown> = {};
+    if (body.professionalProfile !== undefined)
+      profilePatch.professional_profile = readProfessionalProfile(body.professionalProfile);
     if (body.linkedinUrl !== undefined)
       profilePatch.linkedin_url = normalizeLinkedInUrl(body.linkedinUrl);
     if (body.canHelpWith !== undefined)
@@ -140,7 +143,7 @@ export async function GET(request: Request) {
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select(
-        "display_name, avatar_seed, avatar_url, linkedin_url, building, can_help_with, looking_for",
+        "display_name, avatar_seed, avatar_url, linkedin_url, building, can_help_with, looking_for, professional_profile",
       )
       .eq("id", user.id)
       .maybeSingle();
@@ -158,6 +161,7 @@ export async function GET(request: Request) {
               building: profile.building,
               canHelpWith: profile.can_help_with,
               lookingFor: profile.looking_for,
+              professionalProfile: readProfessionalProfile(profile.professional_profile),
             }
           : null,
       },

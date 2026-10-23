@@ -7,6 +7,8 @@ import { normalizeLinkedInUrl } from "@/lib/validation";
 import { ArrowUpRight, MapPin } from "lucide-react";
 import { useState } from "react";
 import "./profile-sheet.css";
+import { ProfileImporter } from "./profile-importer";
+import { professionalFields, readProfessionalProfile, type ProfessionalProfile } from "@/lib/professional-profile";
 
 type Props = {
   attendee: PublicAttendee | null;
@@ -14,6 +16,7 @@ type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSaveLinkedIn?: (url: string) => Promise<void>;
+  onSaveProfessionalProfile?: (profile: ProfessionalProfile | null) => Promise<void>;
 };
 
 function LinkedInEditor({ url, onSave }: {
@@ -65,9 +68,11 @@ export function ProfileSheet({
   open,
   onOpenChange,
   onSaveLinkedIn,
+  onSaveProfessionalProfile,
 }: Props) {
   if (!attendee) return null;
   const linkedinUrl = normalizeLinkedInUrl(attendee.linkedinUrl);
+  const professional = readProfessionalProfile(attendee.professionalProfile);
   return (
     <MobileSheet
       open={open}
@@ -100,6 +105,20 @@ export function ProfileSheet({
         </span>
       </div>
       <p className="profile-event">{eventName}</p>
+      {attendee.isSelf && onSaveProfessionalProfile && (
+        <ProfileImporter key={attendee.membershipId} profile={professional} onSave={onSaveProfessionalProfile} />
+      )}
+      {professional && (
+        <div className="professional-profile" aria-label="Imported professional profile">
+          <p className="profile-import-source">From a profile export · reviewed by the attendee</p>
+          {professionalFields.map(field => professional[field.name] ? (
+            <section className="profile-section" key={field.name}>
+              <h3>{field.label.toUpperCase()}</h3>
+              <p>{professional[field.name]}</p>
+            </section>
+          ) : null)}
+        </div>
+      )}
       {attendee.building && (
         <section className="profile-section">
           <h3>{attendee.isSelf ? "WHAT YOU’RE BUILDING" : "WHAT THEY’RE BUILDING"}</h3>
@@ -118,7 +137,7 @@ export function ProfileSheet({
           <p>{attendee.lookingFor}</p>
         </section>
       )}
-      {!attendee.building && !attendee.canHelpWith && !attendee.lookingFor && (
+      {!professional && !attendee.building && !attendee.canHelpWith && !attendee.lookingFor && (
         <p className="muted">
           {attendee.isSelf ? "Add your project, offers and needs in Introductions so others can learn about you." : "No profile details shared yet. Start with a hello."}
         </p>
@@ -137,7 +156,7 @@ export function ProfileSheet({
           <LinkedInEditor key={attendee.membershipId} url={linkedinUrl} onSave={onSaveLinkedIn} />
         )}
       </section>
-      <p className="profile-source-note">Offers, projects and goals are shared by the attendee. Work history and skills are not automatically imported from LinkedIn.</p>
+      <p className="profile-source-note">Offers, projects and goals are shared by the attendee. Work history and skills are not automatically imported by LinkedIn sign-in; attendees can import and review their own profile export.</p>
       <p className="privacy-note">
         Markers are arranged around the venue, not anyone’s exact location.
       </p>

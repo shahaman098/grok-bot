@@ -17,11 +17,35 @@ vi.mock("@/lib/supabase/server", () => ({ createClient: async () => ({
 }) }));
 import { PATCH } from "@/app/api/me/route";
 import { normalizeLinkedInUrl, patchMeSchema } from "@/lib/validation";
+import { emptyProfessionalProfile } from "@/lib/professional-profile";
 const request = (body: object, origin = "https://bumpin.test") => new Request("https://bumpin.test/api/me", {
   method: "PATCH", headers: { "Content-Type": "application/json", Origin: origin }, body: JSON.stringify({ eventSlug: "event", ...body }),
 });
 beforeEach(() => { vi.clearAllMocks(); state.user = { id: "caller" }; state.joined = true; state.failed = false; });
 describe("shared LinkedIn link", () => {
+  it("saves reviewed details only to the authenticated profile and preserves matching fields", async () => {
+    const professionalProfile = { ...emptyProfessionalProfile, headline: " Engineer ", skills: "React" };
+    expect((await PATCH(request({ professionalProfile, userId: "victim" }))).status).toBe(200);
+    expect(state.patch).toHaveBeenCalledWith({ professional_profile: { ...professionalProfile, headline: "Engineer" } });
+    expect(state.owner).toHaveBeenCalledWith("id", "caller");
+  });
+  it("rejects malformed or overlong professional sections before a write", async () => {
+    for (const professionalProfile of [{ skills: "React" }, { ...emptyProfessionalProfile, headline: "a".repeat(241) }, { ...emptyProfessionalProfile, email: "private@example.com" }]) {
+      expect((await PATCH(request({ professionalProfile }))).status).toBe(400);
+    }
+    expect(state.patch).not.toHaveBeenCalled();
+  });
+  it("clears imported details without clearing identity, links or event goals", async () => {
+    expect((await PATCH(request({ professionalProfile: null }))).status).toBe(200);
+    expect(state.patch).toHaveBeenCalledWith({ professional_profile: null });
+  });
+  it("rejects unauthenticated and non-member professional-profile saves", async () => {
+    state.user = null;
+    expect((await PATCH(request({ professionalProfile: emptyProfessionalProfile }))).status).toBe(401);
+    state.user = { id: "caller" }; state.joined = false;
+    expect((await PATCH(request({ professionalProfile: null }))).status).toBe(404);
+    expect(state.patch).not.toHaveBeenCalled();
+  });
   it("normalizes a member link and strips tracking and fragments", () => {
     expect(normalizeLinkedInUrl("linkedin.com/in/example?trk=example#about")).toBe("https://www.linkedin.com/in/example");
     expect(patchMeSchema.parse({ eventSlug: "event", linkedinUrl: "" }).linkedinUrl).toBe("");

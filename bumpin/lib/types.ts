@@ -1,9 +1,12 @@
+import type { ProfessionalProfile } from "@/lib/professional-profile";
+
 export type PublicAttendee = {
   membershipId: string;
   displayName: string;
   linkedinUrl: string | null;
   avatarSeed: string;
   avatarUrl?: string | null;
+  professionalProfile?: ProfessionalProfile | null;
   building: string | null;
   canHelpWith?: string | null;
   lookingFor: string | null;

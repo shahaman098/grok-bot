@@ -11,6 +11,7 @@ const eslintConfig = defineConfig([
     ".next/**",
     ".next-e2e/**",
     "public/maplibre/**",
+    "public/pdfjs/**",
     "out/**",
     "build/**",
     "next-env.d.ts",

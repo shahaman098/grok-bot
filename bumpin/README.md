@@ -12,6 +12,8 @@
 
 Profiles are self-declared. Matching and copy use local rules/templates. The [Grok Bot MCP connector](docs/GROK-BOT-CONNECTION.md) exposes public event tools and optional, explicitly authorized event-scoped attendee matching. The separate xAI voice concierge has its own activation requirements. Acceptance does not prove a meeting or collaboration occurred.
 
+From People, open your own profile and choose **Import your LinkedIn profile** to read a text-based LinkedIn PDF or supported CSV export (including ZIP). Files are parsed on your device. Review/edit the extracted professional sections, then explicitly save them to your visible profile. This is separate from LinkedIn sign-in and preserves event-specific offers/goals. See [profile import](docs/LINKEDIN-PROFILE-IMPORT.md) for limits and verification.
+
 ## Run
 
 The **Concierge** tab adds voice or typed requests, profile-grounded reasons and matched venue markers. Paid voice and AI matching require owner approval through **Request access**; free basic typed matching remains available. Live xAI access also requires a separate key and feature flag, disabled by default. See [access administration](docs/PAID-ACCESS.md) and [concierge setup and verification](docs/VOICE-CONCIERGE.md) for actual release/provider evidence.
@@ -40,6 +42,7 @@ Apply every SQL file in `supabase/migrations/` in filename order. Existing insta
 - `20261022210000_concierge_quota.sql` and `20261022230000_concierge_quota_grants.sql` — atomic per-member quotas for the optional voice/search concierge; execution is restricted to authenticated members.
 - `20261022220000_bot_connector.sql` — revocable, hashed, read-only credentials for the Grok Bot MCP connector.
 - `20261022240000_concierge_access.sql` — owner-granted access list for the paid concierge endpoints.
+- `20261022250000_professional_profile.sql` — bounded reviewed professional sections, with existing profile ownership and member-only visibility enforced. Apply before releasing the importer: `node --env-file=.env.local scripts/apply-profile-import-migration.mjs`.
 
 The new attendee RPC shape adds `can_help_with`; old profiles remain valid. Connection tables cannot be read or written directly by browser roles. SQL functions validate participants, transitions, evidence excerpts and preview versions. Profile edits reset stage consent; the request snapshot remains labelled as captured at introduction time.
 

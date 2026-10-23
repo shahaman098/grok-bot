@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { professionalProfileSchema } from "@/lib/professional-profile";
 
 export function normalizeLinkedInUrl(
   raw: string | undefined | null,
@@ -36,6 +37,7 @@ export const joinBodySchema = z.object({
 
 export const patchMeSchema = z.object({
   eventSlug: z.string().trim().min(1).max(64),
+  professionalProfile: professionalProfileSchema.nullable().optional(),
   linkedinUrl: z.string().trim().max(2048).refine(
     (value) => value === "" || normalizeLinkedInUrl(value) !== null,
     "Use your LinkedIn profile URL, such as linkedin.com/in/your-name.",

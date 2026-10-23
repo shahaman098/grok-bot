@@ -1,4 +1,5 @@
 import type { PublicAttendee } from "@/lib/types";
+import { readProfessionalProfile } from "@/lib/professional-profile";
 
 export function mapAttendeeRow(row: {
   membership_id: string;
@@ -6,6 +7,7 @@ export function mapAttendeeRow(row: {
   linkedin_url: string | null;
   avatar_seed: string;
   avatar_url?: string | null;
+  professional_profile?: unknown;
   building: string | null;
   can_help_with?: string | null;
   looking_for: string | null;
@@ -22,6 +24,7 @@ export function mapAttendeeRow(row: {
     linkedinUrl: row.linkedin_url,
     avatarSeed: row.avatar_seed,
     avatarUrl: row.avatar_url ?? null,
+    professionalProfile: readProfessionalProfile(row.professional_profile),
     building: row.building,
     canHelpWith: row.can_help_with ?? null,
     lookingFor: row.looking_for,

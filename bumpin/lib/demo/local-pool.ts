@@ -1,6 +1,7 @@
 import { invalidateDemoConnections } from "@/lib/demo/connections";
 import { displayPositionFromSeed } from "@/lib/geo";
 import type { PublicAttendee } from "@/lib/types";
+import { readProfessionalProfile, type ProfessionalProfile } from "@/lib/professional-profile";
 
 const CHANNEL = "bumpin-demo";
 const STORAGE_KEY = "bumpin-demo-v2";
@@ -139,6 +140,13 @@ export function updateDemoLinkedIn(slug: string, linkedinUrl: string | null) {
   savePool(slug, loadPool(slug).map((m) =>
     m.membershipId === member.membershipId ? { ...m, linkedinUrl } : m,
   ));
+}
+
+export function updateDemoProfessionalProfile(slug: string, profile: ProfessionalProfile | null) {
+  const member = getDemoMember(slug);
+  if (!member) throw new Error("Join this event first.");
+  savePool(slug, loadPool(slug).map(m => m.membershipId === member.membershipId
+    ? { ...m, professionalProfile: readProfessionalProfile(profile) } : m));
 }
 
 export function updateDemoProfile(

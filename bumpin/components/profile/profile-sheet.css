@@ -8,6 +8,75 @@
   line-height: 1.65;
   color: var(--muted);
 }
+.profile-import {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 0 14px;
+  margin-bottom: 22px;
+  background: var(--surface);
+}
+.profile-import > summary {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+}
+.profile-import-content,
+.profile-import-review,
+.profile-import-actions {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.profile-import-content {
+  padding-bottom: 16px;
+}
+.profile-import .muted,
+.profile-import-privacy,
+.profile-import-warning,
+.profile-export-help {
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.profile-import-privacy,
+.profile-import-source {
+  color: var(--accent);
+}
+.profile-import-source {
+  font-size: 11px;
+  margin-bottom: 16px;
+}
+.profile-export-help summary {
+  cursor: pointer;
+  min-height: 44px;
+  align-content: center;
+}
+.profile-file-field input {
+  width: 100%;
+  min-width: 0;
+  font-size: 12px;
+}
+.profile-import textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 60px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.profile-import .primary-button,
+.profile-import .secondary-button {
+  width: 100%;
+  min-height: 44px;
+}
+.professional-profile {
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 22px;
+}
 .profile-link-section .profile-link-address {
   font-size: 15px;
   margin-bottom: 8px;

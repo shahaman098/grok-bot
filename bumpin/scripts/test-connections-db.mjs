@@ -108,6 +108,7 @@ try {
     "20261022180000_venue_only_positions.sql",
     "20261022190000_love_at_first_bot.sql",
     "20261022200000_linkedin_onboarding.sql",
+    "20261022250000_professional_profile.sql",
   ])
     await admin.query(
       await readFile(join(root, "supabase/migrations", file), "utf8"),
@@ -146,6 +147,21 @@ try {
     ids.map((id) => connect("authenticated", id)),
   );
   const anon = await connect("anon");
+  await test("reviewed professional details obey ownership, visibility and JSON bounds", async () => {
+    const profile = { headline: "Engineer", about: "Builds tools", skills: "React", experience: "Acme", education: "Example University" };
+    await a.query("update public.profiles set professional_profile=$1 where id=auth.uid()", [JSON.stringify(profile)]);
+    const row = (await b.query("select professional_profile from public.list_event_attendees('grok-bot-london') where membership_id=$1", [digest(ids[0])])).rows[0];
+    assert.deepEqual(row.professional_profile, profile);
+    assert.equal((await outsider.query("select * from public.list_event_attendees('grok-bot-london')")).rows.length, 0);
+    const other = await b.query("update public.profiles set professional_profile=null where id=$1", [ids[0]]);
+    assert.equal(other.rowCount, 0);
+    await assert.rejects(a.query("update public.profiles set professional_profile=$1 where id=auth.uid()", [JSON.stringify({ ...profile, skills: "a".repeat(1001) })]), error => error.code === "23514");
+    await assert.rejects(a.query("update public.profiles set professional_profile=$1 where id=auth.uid()", [JSON.stringify({ headline: "Incomplete" })]), error => error.code === "23514");
+    await a.query("update public.event_memberships set visible=false where event_id=$1 and user_id=auth.uid()", [event.id]);
+    assert.equal((await b.query("select * from public.list_event_attendees('grok-bot-london') where membership_id=$1", [digest(ids[0])])).rows.length, 0);
+    await a.query("update public.event_memberships set visible=true where event_id=$1 and user_id=auth.uid()", [event.id]);
+    await a.query("update public.profiles set professional_profile=null where id=auth.uid()");
+  });
   await test("identity photos obey CDN constraints and event/visibility access", async () => {
     await a.query(
       "update public.profiles set avatar_url=$1 where id=auth.uid()",
